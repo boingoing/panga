@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <array>
+#include <functional>
 
 namespace panga {
 

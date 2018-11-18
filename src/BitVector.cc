@@ -1,6 +1,8 @@
 #include <limits>
 #include <algorithm>
 #include <cassert>
+#include <cstdio>
+#include <cstring>
 
 #include "BitVector.h"
 

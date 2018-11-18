@@ -9,22 +9,23 @@ using namespace panga;
 
 GeneticAlgorithm::GeneticAlgorithm() :
     _genome(nullptr),
+    _mutationRateSchedule(MutationRateSchedule::Constant),
     _populationSize(0),
     _totalGenerations(0),
     _currentGeneration(0),
-    _mutationRate(0.001),
-    _crossoverRate(0.9),
-    _mutatorType(MutatorType::Flip),
-    _mutationRateSchedule(MutationRateSchedule::Constant),
-    _crossoverType(CrossoverType::TwoPoint),
-    _selectorType(SelectorType::RouletteWheel),
-    _crossoverIgnoreGeneBoundaries(true),
-    _allowSameParentCouples(false),
-    _fitnessFunction(nullptr),
     _eliteCount(0),
     _mutatedEliteCount(0),
-    _mutatedEliteMutationRate(0),
-    _tournamentSize(2) {
+    _mutationRate(0.05),
+    _crossoverRate(0.9),
+    _mutatedEliteMutationRate(0.0),
+    _crossoverType(CrossoverType::TwoPoint),
+    _mutatorType(MutatorType::Flip),
+    _selectorType(SelectorType::RouletteWheel),
+    _tournamentSize(2),
+    _crossoverIgnoreGeneBoundaries(true),
+    _allowSameParentCouples(false),
+    _userData(nullptr),
+    _fitnessFunction(nullptr) {
 }
 
 GeneticAlgorithm::~GeneticAlgorithm() {
