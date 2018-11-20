@@ -64,18 +64,20 @@ public:
 
     /**
      * Get the bit offset where a gene starts.
-     * Note: Do not call this for boolean genes.
      */
     size_t GetGeneStartBitIndex(size_t geneIndex) const;
 
     /**
      * Get the bit width for a gene.
-     * Note: Do not call this for boolean genes.
      */
     size_t GetGeneBitWitdh(size_t geneIndex) const;
     size_t GetFirstBooleanGeneBitIndex() const;
     size_t GetFirstBooleanGeneIndex() const;
     size_t GetGeneCount() const;
+
+    /**
+     * Get the number of bits needed to encode this Genome.
+     */
     size_t BitsRequired() const;
 };
 
