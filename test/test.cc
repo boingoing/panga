@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include <cstring>
 
 #include "GeneticAlgorithm.h"
 #include "BitVector.h"
