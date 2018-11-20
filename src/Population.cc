@@ -54,11 +54,11 @@ Individual* Population::RouletteWheelSelect(RandomWrapper* randomWrapper) {
     return this->at(lower);
 }
 
-Individual* Population::TournamentSelect(size_t _tournamentSize, RandomWrapper* randomWrapper) {
+Individual* Population::TournamentSelect(size_t tournamentSize, RandomWrapper* randomWrapper) {
     Individual* selected = nullptr;
 
     // Choose random individuals from the population to be part of the tournament.
-    for (size_t i = 0; i < _tournamentSize; i++) {
+    for (size_t i = 0; i < tournamentSize; i++) {
         Individual* temp = this->UniformSelect(randomWrapper);
 
         // If this is the first individual we've picked, it will be the winner for now.

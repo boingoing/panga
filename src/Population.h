@@ -16,7 +16,7 @@ public:
 
     Individual* UniformSelect(RandomWrapper* randomWrapper);
     Individual* RouletteWheelSelect(RandomWrapper* randomWrapper);
-    Individual* TournamentSelect(size_t _tournamentSize, RandomWrapper* randomWrapper);
+    Individual* TournamentSelect(size_t tournamentSize, RandomWrapper* randomWrapper);
     Individual* RankSelect();
 };
 
