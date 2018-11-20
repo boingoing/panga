@@ -8,11 +8,11 @@ You can build panga on any platform with a compiler which supports c++17 languag
 
 ### Tested build configurations
 
-Windows
+Windows 10
 * CMake 3.13.0-rc3
 * Visual Studio 2017 15.8.9
 
-Ubuntu
+Ubuntu 18.04
 * CMake 3.10.2
 * Clang 6.0.0
 
