@@ -58,10 +58,8 @@ int main(int argc, const char** argv) {
     ga.SetUserData(&userData);
     ga.Initialize();
 
-    double minScore = std::numeric_limits<double>::max();
-
-    // minScore will fall below 1 when we've solved the problem
-    while (minScore > 0.5) {
+    // Minimum score will fall below 1 when we've solved the problem
+    do {
         // Pass the current generation and individual to the fitness function.
         // Reset current individual for this population
         userData.currentIndividual = 1;
@@ -77,11 +75,7 @@ int main(int argc, const char** argv) {
                   << " stdev: " << ga.GetScoreStandardDeviation()
                   << " popdiv: " << ga.GetPopulationDiversity()
                   << std::endl;
-
-        if (ga.GetMinimumScore() < minScore) {
-            minScore = ga.GetMinimumScore();
-        }
-    }
+    } while (ga.GetMinimumScore() > 0.5);
 
     return 0;
 }
