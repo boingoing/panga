@@ -54,10 +54,10 @@ int main(int argc, const char** argv) {
     ga.SetMutatedEliteCount(0);
     ga.SetMutatedEliteMutationRate(0.5);
     ga.SetFitnessFunction(TestObjective);
-    ga.SetMutationRateSchedule(MutationRateSchedule::Proportional);
-    ga.SetCrossoverType(CrossoverType::Uniform);
-    ga.SetMutatorType(MutatorType::Flip);
-    ga.SetSelectorType(SelectorType::Tournament);
+    ga.SetMutationRateSchedule(GeneticAlgorithm::MutationRateSchedule::Proportional);
+    ga.SetCrossoverType(GeneticAlgorithm::CrossoverType::Uniform);
+    ga.SetMutatorType(GeneticAlgorithm::MutatorType::Flip);
+    ga.SetSelectorType(GeneticAlgorithm::SelectorType::Tournament);
     ga.SetTournamentSize(5);
     ga.SetKPointCrossoverPointCount(5);
     ga.SetProportionalMutationBitCount(1);

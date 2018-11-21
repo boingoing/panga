@@ -23,7 +23,7 @@ protected:
     size_t _bytesCount;
 
     /**
-     * Count of the bits stored in the BitVector.
+     * Count of the bits stored in the BitVector.<br/>
      * Note: This may be less than the number of bits stored in all the bytes
      *       in the bytes array.
      */
@@ -35,13 +35,13 @@ public:
     ~BitVector();
 
     /**
-     * Deep copy a BitVector.
+     * Deep copy a BitVector.<br/>
      * Resizes this to be the same size as rhs.
      */
     void operator=(const BitVector& rhs);
 
     /**
-     * Calculate equality between two BitVectors.
+     * Calculate equality between two BitVectors.<br/>
      * @param bitsToCompare Limit comparision to only the first bitsToCompare bits.
      */
     bool Equals(const BitVector* rhs, size_t bitsToCompare);
@@ -52,7 +52,7 @@ public:
     bool Equals(const BitVector* rhs);
 
     /**
-     * Set the number of bits in the BitVector.
+     * Set the number of bits in the BitVector.<br/>
      * Note: Unsets all bits in the BitVector.
      */
     void SetBitCount(size_t bitCount);
@@ -63,8 +63,8 @@ public:
     size_t GetBitCount() const;
 
     /**
-     * Clip the length of the BitVector.
-     * Does not reduce the size of the backing storage.
+     * Clip the length of the BitVector.<br/>
+     * Does not reduce the size of the backing storage.<br/>
      * Note: Cannot grow the BitVector (bitCount must be less than current count).
      */
     void Clip(size_t bitCount);
@@ -143,9 +143,9 @@ public:
     size_t HammingDistance(const BitVector* rhs);
 
     /**
-     * Write a binary representation of this BitVector into a buffer.
-     * The buffer will be null-terminated.
-     * Each character in the resulting buffer will be a '0' or '1'.
+     * Write a binary representation of this BitVector into a buffer.<br/>
+     * The buffer will be null-terminated.<br/>
+     * Each character in the resulting buffer will be a '0' or '1'.<br/>
      * Note: bufferLength must be > bitCount.
      * @param buffer Buffer which we will write into.
      * @param bufferLength Length of buffer in bytes.
@@ -163,8 +163,8 @@ public:
     void FromString(const char* buffer, size_t bufferLength);
 
     /**
-     * Write a hex representation of this BitVector into a buffer.
-     * The buffer will be null-terminated.
+     * Write a hex representation of this BitVector into a buffer.<br/>
+     * The buffer will be null-terminated.<br/>
      * Note: bufferLength must be > bitCount / 8 * 2.
      * @param buffer Buffer which we will write into.
      * @param bufferLength Length of buffer in bytes.

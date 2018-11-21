@@ -118,7 +118,7 @@ void GeneticAlgorithm::SetMutationRateSchedule(MutationRateSchedule mutationRate
     this->_mutationRateSchedule = mutationRateSchedule;
 }
 
-MutationRateSchedule GeneticAlgorithm::GetMutationRateSchedule() {
+GeneticAlgorithm::MutationRateSchedule GeneticAlgorithm::GetMutationRateSchedule() {
     return this->_mutationRateSchedule;
 }
 
@@ -134,7 +134,7 @@ void GeneticAlgorithm::SetCrossoverType(CrossoverType crossoverType) {
     this->_crossoverType = crossoverType;
 }
 
-CrossoverType GeneticAlgorithm::GetCrossoverType() {
+GeneticAlgorithm::CrossoverType GeneticAlgorithm::GetCrossoverType() {
     return this->_crossoverType;
 }
 
@@ -142,7 +142,7 @@ void GeneticAlgorithm::SetMutatorType(MutatorType mutatorType) {
     this->_mutatorType = mutatorType;
 }
 
-MutatorType GeneticAlgorithm::GetMutatorType() {
+GeneticAlgorithm::MutatorType GeneticAlgorithm::GetMutatorType() {
     return this->_mutatorType;
 }
 
@@ -150,7 +150,7 @@ void GeneticAlgorithm::SetSelectorType(SelectorType selectorType) {
     this->_selectorType = selectorType;
 }
 
-SelectorType GeneticAlgorithm::GetSelectorType() {
+GeneticAlgorithm::SelectorType GeneticAlgorithm::GetSelectorType() {
     return this->_selectorType;
 }
 
@@ -502,7 +502,7 @@ Individual* GeneticAlgorithm::SelectOne(Population* population) {
     }
 }
 
-void GeneticAlgorithm::SelectParents(Population* population, Parents* parents) {
+void GeneticAlgorithm::SelectParents(Population* population, std::pair<Individual*, Individual*>* parents) {
     assert(population->size() > 0);
 
     parents->first = this->SelectOne(population);
