@@ -1,0 +1,8 @@
+<map id="panga::GeneticAlgorithm" name="panga::GeneticAlgorithm">
+<area shape="rect" id="node2" href="$classpanga_1_1Population.html" title="panga::Population" alt="" coords="34,184,173,211"/>
+<area shape="rect" id="node4" href="$classpanga_1_1Genome.html" title="panga::Genome" alt="" coords="238,5,363,32"/>
+<area shape="rect" id="node6" href="$classpanga_1_1Chromosome.html" title="panga::Chromosome" alt="" coords="338,95,495,121"/>
+<area shape="rect" id="node5" href="$classpanga_1_1Individual.html" title="panga::Individual" alt="" coords="339,184,473,211"/>
+<area shape="rect" id="node7" href="$classpanga_1_1BitVector.html" title="panga::BitVector" alt="" coords="388,5,517,32"/>
+<area shape="rect" id="node8" href="$classpanga_1_1RandomWrapper.html" title="panga::RandomWrapper" alt="" coords="498,184,677,211"/>
+</map>
