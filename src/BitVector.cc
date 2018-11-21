@@ -54,11 +54,17 @@ bool BitVector::Compare(std::byte* left, std::byte* right, size_t bitsToCompare)
     return std::to_integer<uint8_t>(result) == 0;
 }
 
-BitVector::BitVector(size_t bitCount) : _bytes(nullptr) {
+BitVector::BitVector(size_t bitCount) :
+    _bytes(nullptr),
+    _bytesCount(0),
+    _bitCount(0) {
     this->SetBitCount(bitCount);
 }
 
-BitVector::BitVector(const BitVector& source) : _bytes(nullptr) {
+BitVector::BitVector(const BitVector& source) :
+    _bytes(nullptr),
+    _bytesCount(0),
+    _bitCount(0) {
     *this = source;
 }
 
@@ -76,9 +82,15 @@ void BitVector::Clear() {
 }
 
 void BitVector::Resize(size_t bitCount) {
-    this->_bytesCount = 1 + (bitCount / 8);
+    size_t newBytesCount = 1 + (bitCount / 8);
+
+    // Allocate new memory only if we need to grow the vector.
+    if (this->_bytesCount < newBytesCount) {
+        this->_bytes = (std::byte*)realloc(this->_bytes, sizeof(std::byte) * newBytesCount);
+        this->_bytesCount = newBytesCount;
+    }
+
     this->_bitCount = bitCount;
-    this->_bytes = (std::byte*)realloc(this->_bytes, sizeof(std::byte) * this->_bytesCount);
 }
 
 void BitVector::SetBitCount(size_t bitCount) {
@@ -135,14 +147,7 @@ bool BitVector::Get(size_t index) {
 
 void BitVector::SubVector(BitVector* destination, size_t destinationStartIndex, size_t sourceStartIndex, size_t bitWidth) {
     // Resize destination if it's not big enough
-    if (destination->_bitCount < destinationStartIndex + bitWidth) {
-        size_t oldByteCount = destination->_bytesCount;
-        destination->Resize(destinationStartIndex + bitWidth);
-        // Zero-out any new bytes if we resized and added new bytes
-        if (destination->_bytesCount > oldByteCount) {
-            memset(destination->_bytes + oldByteCount, 0, sizeof(std::byte) * (destination->_bytesCount - oldByteCount));
-        }
-    }
+    destination->Resize(destinationStartIndex + bitWidth);
 
     WriteBytes(this->_bytes, sourceStartIndex, destination->_bytes, destinationStartIndex, bitWidth);
 }
@@ -165,9 +170,19 @@ size_t BitVector::HammingDistance(const BitVector* rhs) {
         return std::numeric_limits<size_t>::max();
     }
 
-    for (size_t i = 0; i < this->_bytesCount; i++) {
+    size_t lastByte = this->_bitCount / 8;
+
+    // All but the last byte
+    for (size_t i = 0; i < lastByte; i++) {
         distance += CountSetBits(this->_bytes[i] ^ rhs->_bytes[i]);
     }
+
+    // Mask the last byte
+    size_t relevantBits = this->_bitCount % 8;
+    std::byte mask = std::byte{ 0xFF } >> (8 - relevantBits);
+
+    distance += CountSetBits((this->_bytes[lastByte] & mask)
+                             ^ (rhs->_bytes[lastByte] & mask));
 
     return distance;
 }
@@ -212,27 +227,35 @@ void BitVector::FromString(const char* buffer, size_t bufferLength) {
 }
 
 size_t BitVector::ToHexString(char* buffer, size_t bufferLength) {
+    size_t lastByte = this->_bitCount / 8;
+    size_t bytesNeeded = (lastByte + 1) * 2;
+
     if (buffer == nullptr) {
-        return this->_bytesCount * 2 + 1;
+        return bytesNeeded + 1;
     }
 
-    assert(bufferLength > this->_bytesCount * 2);
+    assert(bufferLength > bytesNeeded);
 
-    for (size_t i = 0; i < this->_bytesCount; i++) {
+    for (size_t i = 0; i < lastByte; i++) {
         sprintf(buffer + 2 * i, "%02hhx", this->_bytes[i]);
     }
 
-    buffer[this->_bytesCount * 2] = '\0';
+    // Mask the last byte
+    size_t relevantBits = this->_bitCount % 8;
+    std::byte mask = std::byte{ 0xFF } >> (8 - relevantBits);
 
-    return this->_bytesCount * 2 + 1;
+    sprintf(buffer + 2 * lastByte, "%02hhx", this->_bytes[lastByte] & mask);
+
+    buffer[bytesNeeded] = '\0';
+
+    return bytesNeeded + 1;
 }
 
 void BitVector::FromHexString(const char* buffer, size_t bufferLength) {
     assert(buffer != nullptr);
     assert(bufferLength >= 2);
 
-    this->Resize(bufferLength / 2 * 8);
-    this->Clear();
+    this->SetBitCount(bufferLength / 2 * 8);
 
     for (size_t i = 0; i < this->_bytesCount; i++) {
         sscanf(buffer + 2 * i, "%02hhx", &this->_bytes[i]);

@@ -137,56 +137,72 @@ bool GeneticAlgorithm::GetAllowSameParentCouples() {
     return this->_allowSameParentCouples;
 }
 
+size_t GeneticAlgorithm::GetCurrentGeneration() {
+    return this->_currentGeneration;
+}
+
+void GeneticAlgorithm::SetTournamentSize(size_t tournamentSize) {
+    this->_tournamentSize = tournamentSize;
+}
+
+size_t GeneticAlgorithm::GetTournamentSize() {
+    return this->_tournamentSize;
+}
+
 Individual* GeneticAlgorithm::GetBestIndividual() {
-    return this->_population.front();
+    if (this->_lastGenerationPopulation.empty()) {
+        return nullptr;
+    }
+
+    return this->_lastGenerationPopulation.front();
 }
 
 Individual* GeneticAlgorithm::GetIndividual(size_t index) {
-    assert(index < this->_population.size());
-    return this->_population[index];
+    assert(index < this->_lastGenerationPopulation.size());
+
+    return this->_lastGenerationPopulation[index];
 }
 
-double GeneticAlgorithm::GetMinScore() {
-    assert(!this->_population.empty());
-    return this->_population.front()->GetScore();
+double GeneticAlgorithm::GetMinimumScore() {
+    assert(!this->_lastGenerationPopulation.empty());
+
+    return this->_lastGenerationPopulation.front()->GetScore();
 }
 
 double GeneticAlgorithm::GetAverageScore() {
-    assert(this->_population.size() == this->_populationSize);
-
-    if (this->_population.empty()) {
+    if (this->_lastGenerationPopulation.empty()) {
         return 0.0;
     }
 
     double sum = 0.0;
-    std::for_each(this->_population.begin(), this->_population.end(), [&] (const Individual* i) {
+    std::for_each(this->_lastGenerationPopulation.begin(), this->_lastGenerationPopulation.end(), [&] (const Individual* i) {
         sum += i->GetScore();
     });
-    return sum / this->_population.size();
+    return sum / this->_lastGenerationPopulation.size();
 }
 
-double GeneticAlgorithm::GetScoreStdev() {
-    assert(this->_population.size() == this->_populationSize);
-
-    if (this->_population.size() <= 1) {
+double GeneticAlgorithm::GetScoreStandardDeviation() {
+    if (this->_lastGenerationPopulation.size() <= 1) {
         return 0.0;
     }
 
     double mean = this->GetAverageScore();
     double sum = 0.0;
-    std::for_each(this->_population.begin(), this->_population.end(), [&](const Individual* i) {
+    std::for_each(this->_lastGenerationPopulation.begin(), this->_lastGenerationPopulation.end(), [&](const Individual* i) {
         double score = i->GetScore();
         sum += (score - mean) * (score - mean);
     });
-    return std::sqrt(sum / (this->_population.size() - 1));
+    return std::sqrt(sum / (this->_lastGenerationPopulation.size() - 1));
 }
 
 double GeneticAlgorithm::GetPopulationDiversity() {
-    uint64_t distance = 0;
+    assert(this->_lastGenerationPopulation.size() == this->_populationSize);
+
+    size_t distance = 0;
 
     for (size_t i = 0; i < this->_populationSize; i++) {
         for (size_t j = i + 1; j < this->_populationSize; j++) {
-            distance += this->_population.at(i)->HammingDistance(this->_population.at(j));
+            distance += this->_lastGenerationPopulation.at(i)->HammingDistance(this->_lastGenerationPopulation.at(j));
         }
     }
 
@@ -200,14 +216,16 @@ void GeneticAlgorithm::DeletePopulation(Population* population) {
     population->clear();
 }
 
-void GeneticAlgorithm::Initialize(std::vector<BitVector*>* initialPopulation) {
+void GeneticAlgorithm::Initialize(const std::vector<const BitVector*>* initialPopulation) {
+    assert(this->_genome != nullptr);
+
     // Delete any existing population members.
     DeletePopulation(&this->_population);
     DeletePopulation(&this->_lastGenerationPopulation);
 
     // Create new population members based on the initialPopulation.
     if (initialPopulation != nullptr) {
-        for (std::vector<BitVector*>::iterator it = initialPopulation->begin(); it != initialPopulation->end(); ++it) {
+        for (std::vector<const BitVector*>::const_iterator it = initialPopulation->begin(); it != initialPopulation->end(); ++it) {
             if (this->_population.size() < this->_populationSize) {
                 this->_population.push_back(new Individual(this->_genome, *it));
             }
@@ -226,12 +244,18 @@ void GeneticAlgorithm::Initialize(std::vector<BitVector*>* initialPopulation) {
     while (this->_lastGenerationPopulation.size() < this->_populationSize) {
         this->_lastGenerationPopulation.push_back(new Individual(this->_genome));
     }
-
-    this->Evaluate();
 }
 
 void GeneticAlgorithm::Step() {
     assert(this->_population.size() == this->_lastGenerationPopulation.size());
+
+    // We are about to score the current population.
+    this->_currentGeneration++;
+
+    // Score and sort the current population.
+    // This population is either the result of Initialize() or a previous
+    // Step() operation.
+    this->Evaluate(&this->_population);
 
     // Get the mutation rate for the current generation.
     double currentMutationRate = this->GetCurrentMutationRate();
@@ -276,51 +300,42 @@ void GeneticAlgorithm::Step() {
         // Mutate offspring.
         this->Mutate(offspring, currentMutationRate);
     }
-
-    // Score and sort the new population.
-    this->Evaluate();
-
-    this->_currentGeneration++;
 }
 
 void GeneticAlgorithm::Score(Individual* individual) {
     individual->SetScore(this->_fitnessFunction(individual, this->_userData));
 }
 
-void GeneticAlgorithm::Evaluate() {
-    assert(this->_population.size() == this->_populationSize);
-
+void GeneticAlgorithm::Evaluate(Population* population) {
     // Score current population.
-    std::for_each(this->_population.begin(), this->_population.end(), [&](Individual* i) {
+    std::for_each(population->begin(), population->end(), [&](Individual* i) {
         this->Score(i);
     });
 
     // Sort the population by increasing raw score.
-    std::sort(this->_population.begin(), this->_population.end(),
+    std::sort(population->begin(), population->end(),
         [](Individual* const& a, Individual* const& b) { return *a < *b; });
 
     // Calculate the Individual fitness scores.
     double scoreSum = 0.0;
-    double bestScore = this->_population.front()->GetScore();
-    double worstScore = this->_population.back()->GetScore();
+    double bestScore = population->front()->GetScore();
+    double worstScore = population->back()->GetScore();
 
     // We need to invert the trend of scores.
     // First, calculate best+worst - score[i] as an intermediate score.
-    std::for_each(this->_population.begin(), this->_population.end(), [&](Individual* i) {
+    std::for_each(population->begin(), population->end(), [&](Individual* i) {
         double tempScore = bestScore + worstScore - i->GetScore();
         scoreSum += tempScore;
         i->SetFitness(tempScore);
     });
 
     // Now calculate fitness as a proportion of the intermediate sum.
-    std::for_each(this->_population.begin(), this->_population.end(), [&](Individual* i) {
+    std::for_each(population->begin(), population->end(), [&](Individual* i) {
         i->SetFitness(i->GetFitness() / scoreSum);
     });
 }
 
 void GeneticAlgorithm::Run() {
-    this->Initialize();
-
     while (this->_currentGeneration < this->_totalGenerations) {
         this->Step();
     }
@@ -332,8 +347,12 @@ double GeneticAlgorithm::GetCurrentMutationRate() {
         return this->_mutationRate;
     case MutationRateSchedule::Deterministic:
     {
-        size_t n = this->_genome->BitsRequired();
-        return 1.0 / (2.0 + ((n - 2.0) / (this->_totalGenerations - 1.0)) * this->_currentGeneration);
+        // If total generations is 0 or if we are on a generation after the total counter,
+        // deterministic calculation would return 0 for mutation rate.
+        // In that case just use the constant-schedule mutation rate instead.
+        return this->_totalGenerations == 0 || this->_currentGeneration > this->_totalGenerations ?
+            this->_mutationRate :
+            1.0 / (2.0 + ((this->_genome->BitsRequired() - 2.0) / (this->_totalGenerations - 1.0)) * this->_currentGeneration);
     }
     case MutationRateSchedule::SelfAdaptive:
         if (this->GetPopulationDiversity() < 0.250) {

@@ -11,9 +11,10 @@ Individual::Individual(const Genome* genome, const BitVector* chromosome) :
     _fitness(0.0),
     _score(0.0) {
     if (chromosome != nullptr) {
-        // Chromosome source vector must have the same number of bits as our genome
+        // Chromosome source vector must have the same number of bits as our genome.
         assert(chromosome->GetBitCount() == genome->BitsRequired());
-        // Copy bits from existing chromosome
+
+        // Copy bits from existing chromosome.
         BitVector::operator=(*chromosome);
     }
 }

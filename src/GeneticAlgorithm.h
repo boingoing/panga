@@ -95,6 +95,9 @@ public:
     void SetAllowSameParentCouples(bool allowSameParentCouples);
     bool GetAllowSameParentCouples();
 
+    void SetTournamentSize(size_t tournamentSize);
+    size_t GetTournamentSize();
+
     void SetTotalGenerations(size_t totalGenerations);
     size_t GetTotalGenerations();
 
@@ -115,6 +118,10 @@ public:
     void SetMutationRateSchedule(MutationRateSchedule mutationRateSchedule);
     void SetMutatorType(MutatorType mutatorType);
 
+    /**
+     * Set some data which will be passed into the fitness function called to
+     * score each Individual.
+     */
     void SetUserData(void* userData);
     void* GetUserData();
 
@@ -129,38 +136,105 @@ public:
     void SetPopulationSize(size_t populationSize);
     size_t GetPopulationSize();
 
+    /**
+     * Return the current generation.
+     * The generation increases after every step.
+     */
+    size_t GetCurrentGeneration();
+
+    /**
+     * Return the best Individual from the current population.
+     */
     Individual* GetBestIndividual();
+
+    /**
+     * Return the Individual at index position from the current population.
+     */
     Individual* GetIndividual(size_t index);
 
-    double GetMinScore();
+    /**
+     * Get the minimum score among individuals in the current population.
+     */
+    double GetMinimumScore();
+
+    /**
+     * Get the average score between individuals in the current population.
+     */
     double GetAverageScore();
-    double GetScoreStdev();
+
+    /**
+     * Get the standard deviation of scores between individuals in the current
+     * population.
+     */
+    double GetScoreStandardDeviation();
+
+    /**
+     * Get the population diversity among individuals in the current population.
+     * The population diversity is a metric used to indicate how much the
+     * genetic material backing the individuals varies. A high diversity value
+     * means the individuals have very different genetic components. A value
+     * of zero means the individuals are identical.
+     */
     double GetPopulationDiversity();
 
-    void Initialize(std::vector<BitVector*>* initialPopulation = nullptr);
+    /**
+     * Initialize the state of the GeneticAlgorithm.
+     * If initialPopulation is passed, use these bits as the chromosomes for
+     * our new population. Otherwise, create a population filled with random
+     * individuals.
+     * @param initialPopulation We will construct new population members and
+     * interpret these values as binary chromosome data. Pass nullptr to
+     * initialize the population randomly.
+     */
+    void Initialize(const std::vector<const BitVector*>* initialPopulation = nullptr);
+
+    /**
+     * Perform one step of the genetic algorithm:
+     *   1) Score the current population of individuals.
+     *      a) This will either be the initial population (if current generation
+     *         is 0) or the population we constructed during the previous step
+     *         operation.
+     *      b) The score operation will leave the population sorted.
+     *   2) Use the current population to construct the next generation
+     *      population.
+     *      a) Uses a combination of elitism, crossover, and mutation to
+     *         construct the new population.
+     *      b) Individuals are chosen from the current population based on their
+     *         fitness scores.
+     *      c) The next generation population is not scored, yet. It will be
+     *         during the next step operation.
+     *   3) Advance the current generation.
+     */
     void Step();
-    void Evaluate();
+
+    /**
+     * Run the GeneticAlgorithm totalGenerations steps.
+     */
+    void Run();
+
+protected:
+    GeneticAlgorithm(const GeneticAlgorithm&);
+
+    /**
+     * Delete each Individual in the population and reset the population
+     * size to 0.
+     */
+    void DeletePopulation(Population* population);
+
+    /**
+     * Score each Individual in the population and then sort the population
+     * in terms of decreasing fitness.
+     */
+    void Evaluate(Population* population);
 
     /**
      * Use the fitness function to score one Individual.
      */
     void Score(Individual* individual);
 
-    /**
-     * Run the GeneticAlgorithm totalGenerations steps.
-     * Also performs initialization.
-     */
-    void Run();
-
-    double GetCurrentMutationRate();
-
-protected:
-    GeneticAlgorithm(const GeneticAlgorithm&);
-
-    void DeletePopulation(Population* population);
-
     void Crossover(Individual* parent1, Individual* parent2, Individual* offspring);
     void Mutate(Individual* individual, double mutationPercentage);
+    double GetCurrentMutationRate();
 
     void InitializeSelector(Population* population);
     void SelectParents(Population* population, Parents* parents);

@@ -50,6 +50,7 @@ Individual* Population::RouletteWheelSelect(RandomWrapper* randomWrapper) {
         }
     }
 
+    lower = std::min((int)this->size() - 1, lower);
     return this->at(lower);
 }
 
