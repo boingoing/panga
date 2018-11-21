@@ -424,7 +424,7 @@ double GeneticAlgorithm::GetCurrentMutationRate() {
             return this->_mutationRate;
         }
     case MutationRateSchedule::Proportional:
-        // Proportional schedule sets a mutation probability in order to flip mutationRate bits.
+        // Proportional schedule sets a mutation probability in order to flip _proportionalMutationBitCount bits.
         assert(this->_genome->BitsRequired() != 0);
         return this->_proportionalMutationBitCount * (1.0 / this->_genome->BitsRequired());
     default:
