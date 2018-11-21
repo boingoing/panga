@@ -18,11 +18,14 @@ GeneticAlgorithm::GeneticAlgorithm() :
     _mutationRate(0.05),
     _crossoverRate(0.9),
     _mutatedEliteMutationRate(0.0),
-    _crossoverType(CrossoverType::TwoPoint),
+    _crossoverType(CrossoverType::Uniform),
     _mutatorType(MutatorType::Flip),
-    _selectorType(SelectorType::RouletteWheel),
+    _selectorType(SelectorType::Tournament),
     _tournamentSize(2),
     _kPointCrossoverPointCount(3),
+    _selfAdaptiveMutationDiversityFloor(0.0002),
+    _selfAdaptiveMutationAggressiveRate(0.1),
+    _proportionalMutationBitCount(1),
     _crossoverIgnoreGeneBoundaries(true),
     _allowSameParentCouples(true),
     _userData(nullptr),
@@ -180,6 +183,30 @@ void GeneticAlgorithm::SetKPointCrossoverPointCount(size_t kPointCrossoverPointC
 
 size_t GeneticAlgorithm::GetKPointCrossoverPointCount() {
     return this->_kPointCrossoverPointCount;
+}
+
+void GeneticAlgorithm::SetSelfAdaptiveMutationDiversityFloor(double selfAdaptiveMutationDiversityFloor) {
+    this->_selfAdaptiveMutationDiversityFloor = selfAdaptiveMutationDiversityFloor;
+}
+
+double GeneticAlgorithm::GetSelfAdaptiveMutationDiversityFloor() {
+    return this->_selfAdaptiveMutationDiversityFloor;
+}
+
+void GeneticAlgorithm::SetSelfAdaptiveMutationAggressiveRate(double selfAdaptiveMutationAggressiveRate) {
+    this->_selfAdaptiveMutationAggressiveRate = selfAdaptiveMutationAggressiveRate;
+}
+
+double GeneticAlgorithm::GetSelfAdaptiveMutationAggressiveRate() {
+    return this->_selfAdaptiveMutationAggressiveRate;
+}
+
+void GeneticAlgorithm::SetProportionalMutationBitCount(size_t proportionalMutationBitCount) {
+    this->_proportionalMutationBitCount = proportionalMutationBitCount;
+}
+
+size_t GeneticAlgorithm::GetProportionalMutationBitCount() {
+    return this->_proportionalMutationBitCount;
 }
 
 Individual* GeneticAlgorithm::GetBestIndividual() {
@@ -391,15 +418,15 @@ double GeneticAlgorithm::GetCurrentMutationRate() {
             1.0 / (2.0 + ((this->_genome->BitsRequired() - 2.0) / (this->_totalGenerations - 1.0)) * this->_currentGeneration);
     }
     case MutationRateSchedule::SelfAdaptive:
-        if (this->GetPopulationDiversity() < 0.250) {
-            return 0.20;
+        if (this->GetPopulationDiversity() < this->_selfAdaptiveMutationDiversityFloor) {
+            return this->_selfAdaptiveMutationAggressiveRate;
         } else {
             return this->_mutationRate;
         }
     case MutationRateSchedule::Proportional:
         // Proportional schedule sets a mutation probability in order to flip mutationRate bits.
         assert(this->_genome->BitsRequired() != 0);
-        return this->_mutationRate * (1.0 / this->_genome->BitsRequired());
+        return this->_proportionalMutationBitCount * (1.0 / this->_genome->BitsRequired());
     default:
         // Invalid mutation rate schedule
         assert(false);

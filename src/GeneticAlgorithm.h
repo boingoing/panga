@@ -11,28 +11,213 @@ class Genome;
 class Individual;
 class BitVector;
 
+/**
+ * Type of crossover we will perform on selected parents in order to produce
+ * offspring for the next generation.
+ * Actual crossover is performed by the Chromosome itself.
+ * @see Crossover
+ * @see SetCrossoverType
+ * @see GetCrossoverType
+ * @see Chromosome
+ */
 enum class CrossoverType : uint8_t {
+    /**
+     * Perform one-point crossover.
+     * The parent chromosomes will be split into two pieces (based on one cut
+     * point) with the offspring receiving the left part of one parent and the
+     * right part of the other parent.
+     * The point at which to cut the parent chromosomes is determined randomly.
+     * @see Chromosome::KPointCrossover
+     */
     OnePoint = 1,
+
+    /**
+     * Perform two-point crossover.
+     * Similar to one-point crossover, but the parent chromosomes will be split
+     * into three pieces (based on two cut points) with the offspring receiving
+     * the first and last part from one parent and the middle part from the
+     * other parent.
+     * The points at which the parent chromosomes is cut will be determined
+     * randomly.
+     * @see Chromosome::KPointCrossover
+     */
     TwoPoint,
+
+    /**
+     * Perform k-point crossover.
+     * Similar to two-point crossover, but the parent chromosomes will be split
+     * into k+1 pieces (based on k cut points) with the offspring receiving
+     * pieces from both parents alternating.
+     * The points at which the parent chromosomes is cut will be determined
+     * randomly.
+     * k is determined by _kPointCrossoverPointCount.
+     * @see _kPointCrossoverPointCount
+     * @see SetKPointCrossoverPointCount
+     * @see GetKPointCrossoverPointCount
+     * @see Chromosome::KPointCrossover
+     */
     KPoint,
+
+    /**
+     * Perform uniform crossover.
+     * Each bit in the chromosome has an equal chance of being copied from
+     * either parent.
+     * @see Chromosome::UniformCrossover
+     */
     Uniform
 };
 
+/**
+ * The type of mutation we will perform on new individuals when they are added
+ * to the next generation population.
+ * @see Mutate
+ * @see SetMutatorType
+ * @see GetMutatorType
+ */
 enum class MutatorType : uint8_t {
+    /**
+     * Perform the flip mutator.
+     * This randomly flips bits in the Individual based on the mutation rate
+     * provided.
+     * Every bit in the chromosome has a mutation rate chance of flipping.
+     * @see Chromosome::FlipMutator
+     */
     Flip = 1
 };
 
+/**
+ * Algorithm we want to use when we select individuals from the current
+ * population to become parents of an offspring in the next generation
+ * population.
+ * Actual selection is done by the Population itself.
+ * @see SetSelectorType
+ * @see GetSelectorType
+ * @see SelectParents
+ * @see SelectOne
+ * @see Population
+ */
 enum class SelectorType : uint8_t {
+    /**
+     * Rank selector.
+     * Always returns the fittest individual from a population.
+     * When _allowSameParentCouples is false, returns the top two individuals
+     * when we select a couple from a population.
+     * @see Population::RankSelect
+     */
     Rank = 1,
+
+    /**
+     * Uniform selector.
+     * Always returns a random individual from a population.
+     * @see Population::UniformSelect
+     */
     Uniform,
+
+    /**
+     * Roulette wheel selector.
+     * Selects an individual with higher fitness more often but has a chance
+     * to select any individual in a population.
+     * This can be visualized by imagining a roulette wheel where each
+     * individual is assigned one slice of the wheel. The size of each slice
+     * is determined by the fitness of the individual where more fit
+     * individuals are assigned a larger slice. Then the wheel is spun and
+     * whichever slice is chosen will cause the associated individual to be
+     * selected.
+     * @see InitializeSelector
+     * @see Population::RouletteWheelSelect
+     */
     RouletteWheel,
+
+    /**
+     * Tournament selector.
+     * Chooses n individuals randomly from the population and selects the one
+     * with the highest fitness.
+     * This tends to select individuals with higher fitness but the tournament
+     * size has an effect.
+     * If n is 1, tournament selector is identical to uniform selector.
+     * If n is the population size, tournament selector is identical to rank
+     * selector.
+     * You can control n with the _tournamentSize property.
+     * @see _tournamentSize
+     * @see SetTournamentSize
+     * @see GetTournamentSize
+     * @see Population::TournamentSelect
+     */
     Tournament
 };
 
+/**
+ * Method by which the mutation rate is adjusted over the course of running
+ * the genetic algorithm.
+ * @see SetMutationRateSchedule
+ * @see GetMutationRateSchedule
+ * @see GetCurrentMutationRate
+ * @see SetMutationRate
+ * @see GetMutationRate
+ */
 enum class MutationRateSchedule : uint8_t {
+    /**
+     * The mutation rate is constant and does not vary from generation to
+     * generation.
+     * The rate will always be _mutationRate.
+     * @see _mutationRate
+     * @see SetMutationRate
+     * @see GetMutationRate
+     */
     Constant = 1,
+
+    /**
+     * The mutation rate varies by generation.
+     * Early generations introduce a lot of mutation which slowly tapers off
+     * to 0 by the last generation. (last generation is controlled by
+     * _totalGenerations)
+     * Strictly, when the current generation has passed _totalGenerations,
+     * we will set the current mutation rate to _mutationRate instead of
+     * 0 because we do not want to stall the evolution.
+     * The computed mutation rate has nothing to do with _mutationRate unless
+     * we have run-past _totalGenerations.
+     * This mutation schedule does a good job of using the mutation operator
+     * to search the solution-space of the chromosome.
+     * @see _totalGenerations
+     * @see _mutationRate
+     * @see SetMutationRate
+     * @see GetMutationRate
+     * @see SetTotalGenerations
+     * @see GetTotalGenerations
+     */
     Deterministic,
+
+    /**
+     * Attempt to increase mutation when the population converges too much.
+     * Uses the population diversity score as a metric.
+     * When this diveristy falls below a floor value
+     * (_selfAdaptiveMutationDiversityFloor), we will introduce more aggressive
+     * mutation in order to increase diversity and keep the evolution from
+     * converging.
+     * The more aggressive mutation rate is configurable via
+     * _selfAdaptiveMutationAggressiveRate.
+     * When diversity is not below the floor value, we use a constant mutation
+     * rate controlled by _mutationRate.
+     * @see _mutationRate
+     * @see SetMutationRate
+     * @see GetMutationRate
+     * @see _selfAdaptiveMutationDiversityFloor
+     * @see SetSelfAdaptiveMutationDiversityFloor
+     * @see GetSelfAdaptiveMutationDiversityFloor
+     * @see _selfAdaptiveMutationAggressiveRate
+     * @see SetSelfAdaptiveMutationAggressiveRate
+     * @see GetSelfAdaptiveMutationAggressiveRate
+     */
     SelfAdaptive,
+
+    /**
+     * Calculates the mutation rate required to flip a number of bits in the
+     * chromosome.
+     * The number of bits is controlled by _proportionalMutationBitCount.
+     * @see _proportionalMutationBitCount
+     * @see SetProportionalMutationBitCount
+     * @see GetProportionalMutationBitCount
+     */
     Proportional
 };
 
@@ -63,6 +248,9 @@ protected:
 
     size_t _tournamentSize;
     size_t _kPointCrossoverPointCount;
+    double _selfAdaptiveMutationDiversityFloor;
+    double _selfAdaptiveMutationAggressiveRate;
+    size_t _proportionalMutationBitCount;
 
     bool _crossoverIgnoreGeneBoundaries;
     bool _allowSameParentCouples;
@@ -76,6 +264,10 @@ public:
     GeneticAlgorithm();
     ~GeneticAlgorithm();
 
+    /**
+     * Set the genome we will use to construct Individuals which make up the
+     * populations of each generation.
+     */
     void SetGenome(const Genome* genome);
     const Genome* GetGenome();
 
@@ -123,6 +315,27 @@ public:
     size_t GetKPointCrossoverPointCount();
 
     /**
+     * Set the floor value for the population diversity, below which we will
+     * more aggressively mutate the population.
+     */
+    void SetSelfAdaptiveMutationDiversityFloor(double selfAdaptiveMutationDiversityFloor);
+    double GetSelfAdaptiveMutationDiversityFloor();
+
+    /**
+     * Set the aggressive mutation rate we will switch to when the population
+     * diversity falls below the self-adaptive mutation diversity floor.
+     */
+    void SetSelfAdaptiveMutationAggressiveRate(double selfAdaptiveMutationAggressiveRate);
+    double GetSelfAdaptiveMutationAggressiveRate();
+
+    /**
+     * Set the number of bits we should attempt to mutate with each mutation
+     * operation.
+     */
+    void SetProportionalMutationBitCount(size_t proportionalMutationBitCount);
+    size_t GetProportionalMutationBitCount();
+
+    /**
      * Set the total number of generations we want to evolve.
      * If you call Run(), we will execute this many generations.
      * If you manually call Step(), you can run more than total generations.
@@ -156,9 +369,21 @@ public:
     void SetCrossoverRate(double crossoverRate);
     double GetCrossoverRate();
 
+    /**
+     * Set the crossover type.
+     * We will use this type to crossover two parent individuals in order to
+     * produce offspring for the next generation.
+     * @see CrossoverType
+     */
     void SetCrossoverType(CrossoverType crossoverType);
     CrossoverType GetCrossoverType();
 
+    /**
+     * Set the selector type.
+     * We will use the selector specified to select two parent individuals on
+     * which to perform crossover to produce offspring for the next generation.
+     * @see SelectorType
+     */
     void SetSelectorType(SelectorType selectorType);
     SelectorType GetSelectorType();
 
@@ -180,12 +405,26 @@ public:
     void SetMutatedEliteCount(size_t mutatedEliteCount);
     size_t GetMutatedEliteCount();
 
+    /**
+     * Set the rate at mutated elite individuals will be mutated.
+     */
     void SetMutatedEliteMutationRate(double mutatedEliteMutationRate);
     double GetMutatedEliteMutationRate();
 
+    /**
+     * Set the mutation rate schedule we will use to determine the mutation
+     * rate over the course of many generations.
+     * @see MutationRateSchedule
+     */
     void SetMutationRateSchedule(MutationRateSchedule mutationRateSchedule);
     MutationRateSchedule GetMutationRateSchedule();
 
+    /**
+     * Set the mutator type.
+     * We will use the mutator to mutate each new offspring before adding it
+     * to the next generation population.
+     * @see MutatorType
+     */
     void SetMutatorType(MutatorType mutatorType);
     MutatorType GetMutatorType();
 

@@ -49,12 +49,13 @@ int main(int argc, const char** argv) {
     ga.SetMutatedEliteCount(0);
     ga.SetMutatedEliteMutationRate(0.5);
     ga.SetFitnessFunction(TestObjective);
-    ga.SetMutationRateSchedule(MutationRateSchedule::Deterministic);
+    ga.SetMutationRateSchedule(MutationRateSchedule::Proportional);
     ga.SetCrossoverType(CrossoverType::Uniform);
     ga.SetMutatorType(MutatorType::Flip);
     ga.SetSelectorType(SelectorType::Tournament);
     ga.SetTournamentSize(5);
     ga.SetKPointCrossoverPointCount(5);
+    ga.SetProportionalMutationBitCount(1);
     ga.SetAllowSameParentCouples(true);
     ga.SetUserData(&userData);
     ga.Initialize();
