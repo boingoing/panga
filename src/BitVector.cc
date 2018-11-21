@@ -158,28 +158,28 @@ uint32_t BitVector::CountSetBits(std::byte val) {
     return c;
 }
 
-size_t BitVector::HammingDistance(const BitVector& rhs) {
+size_t BitVector::HammingDistance(const BitVector* rhs) {
     size_t distance = 0;
 
-    if (this->_bitCount != rhs._bitCount) {
+    if (this->_bitCount != rhs->_bitCount) {
         return std::numeric_limits<size_t>::max();
     }
 
     for (size_t i = 0; i < this->_bytesCount; i++) {
-        distance += CountSetBits(this->_bytes[i] ^ rhs._bytes[i]);
+        distance += CountSetBits(this->_bytes[i] ^ rhs->_bytes[i]);
     }
 
     return distance;
 }
 
-bool BitVector::Equals(const BitVector& rhs, size_t bitsToCompare) {
-    assert(rhs._bitCount >= bitsToCompare);
+bool BitVector::Equals(const BitVector* rhs, size_t bitsToCompare) {
+    assert(rhs->_bitCount >= bitsToCompare);
     assert(this->_bitCount >= bitsToCompare);
 
-    return Compare(this->_bytes, rhs._bytes, bitsToCompare);
+    return Compare(this->_bytes, rhs->_bytes, bitsToCompare);
 }
 
-bool BitVector::Equals(const BitVector& rhs) {
+bool BitVector::Equals(const BitVector* rhs) {
     return this->Equals(rhs, this->_bitCount);
 }
 

@@ -186,7 +186,7 @@ double GeneticAlgorithm::GetPopulationDiversity() {
 
     for (size_t i = 0; i < this->_populationSize; i++) {
         for (size_t j = i + 1; j < this->_populationSize; j++) {
-            distance += this->_population.at(i)->HammingDistance(*this->_population.at(j));
+            distance += this->_population.at(i)->HammingDistance(this->_population.at(j));
         }
     }
 

@@ -39,12 +39,12 @@ public:
      * Calculate equality between two BitVectors.
      * @param bitsToCompare Limit comparision to only the first bitsToCompare bits.
      */
-    bool Equals(const BitVector& rhs, size_t bitsToCompare);
+    bool Equals(const BitVector* rhs, size_t bitsToCompare);
 
     /**
      * Calculate equality between two BitVectors.
      */
-    bool Equals(const BitVector& rhs);
+    bool Equals(const BitVector* rhs);
 
     /**
      * Set the number of bits in the BitVector.
@@ -135,7 +135,7 @@ public:
     /**
      * Calculate the Hamming Distance between two BitVectors.
      */
-    size_t HammingDistance(const BitVector& rhs);
+    size_t HammingDistance(const BitVector* rhs);
 
     /**
      * Write a binary representation of this BitVector into a buffer.
