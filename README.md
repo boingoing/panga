@@ -31,3 +31,7 @@ The library ships with a simple test program in the `panga/test` folder.
 ### Using Visual Studio on Windows
 
 Above `cmake` command generates a Visual Studio solution file (`panga/out/panga_test.sln`) on Windows platforms with Visual Studio. You can open this solution in Visual Studio and use it to build the test program.
+
+## Documentation
+
+https://boingoing.github.io/panga/html/annotated.html
