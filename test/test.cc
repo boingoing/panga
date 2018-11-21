@@ -10,78 +10,76 @@ using namespace panga;
 
 struct TestUserData {
     size_t currentIndividual;
-    size_t populationSize;
     size_t currentGeneration;
-    size_t totalGenerations;
-    size_t targetBitCount;
     BitVector targetBits;
-    std::vector<double> generationalAverageScore;
-    std::vector<double> generationalMinimumScore;
-    std::vector<double> generationalStandardDeviation;
-    std::vector<double> generationalPopulationDiversity;
 };
 
 double TestObjective(Individual* individual, void* userData) {
     TestUserData* testUserData = static_cast<TestUserData*>(userData);
     size_t failBits = testUserData->targetBits.HammingDistance(individual);
 
-    std::cout << "Individual " << testUserData->currentGeneration << ":" << testUserData->currentIndividual << " => Error " << failBits << std::endl;
+    //std::cout << "Individual " << testUserData->currentGeneration << ":" << testUserData->currentIndividual << " => Error " << failBits << std::endl;
 
     testUserData->currentIndividual++;
 
     return (double) failBits;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, const char** argv) {
     Genome genome;
     GeneticAlgorithm ga;
     TestUserData userData;
 
-    genome.AddBooleanGenes(8);
+    if (argc > 1) {
+        size_t len = strlen(argv[1]);
+        userData.targetBits.FromString(argv[1], len);
+    } else {
+        userData.targetBits.SetBitCount(2000);
+    }
+
+    genome.AddBooleanGenes(userData.targetBits.GetBitCount());
 
     ga.SetGenome(&genome);
     ga.SetPopulationSize(100);
     ga.SetTotalGenerations(100);
-    ga.SetMutationRate(0.05);
-    ga.SetCrossoverRate(0.95);
+    ga.SetMutationRate(0.0005);
+    ga.SetCrossoverRate(0.99);
     ga.SetEliteCount(1);
     ga.SetMutatedEliteCount(0);
     ga.SetMutatedEliteMutationRate(0.5);
     ga.SetFitnessFunction(TestObjective);
     ga.SetMutationRateSchedule(MutationRateSchedule::Deterministic);
-    ga.SetCrossoverType(CrossoverType::TwoPoint);
+    ga.SetCrossoverType(CrossoverType::Uniform);
     ga.SetMutatorType(MutatorType::Flip);
-    ga.SetSelectorType(SelectorType::RouletteWheel);
+    ga.SetSelectorType(SelectorType::Tournament);
+    ga.SetTournamentSize(5);
     ga.SetAllowSameParentCouples(true);
     ga.SetUserData(&userData);
     ga.Initialize();
 
-    userData.currentIndividual = 0;
-    userData.currentGeneration = 0;
-    userData.populationSize = ga.GetPopulationSize();
-    userData.totalGenerations = ga.GetTotalGenerations();
-    userData.targetBits.SetBitCount(genome.BitsRequired());
-    userData.generationalAverageScore.resize(ga.GetTotalGenerations() + 1);
-    userData.generationalMinimumScore.resize(ga.GetTotalGenerations() + 1);
-    userData.generationalStandardDeviation.resize(ga.GetTotalGenerations() + 1);
-    userData.generationalPopulationDiversity.resize(ga.GetTotalGenerations() + 1);
+    double minScore = std::numeric_limits<double>::max();
 
-    for (userData.currentGeneration = 0; userData.currentGeneration < userData.totalGenerations; userData.currentGeneration++) {
-        userData.currentIndividual = 0;
+    // minScore will fall below 1 when we've solved the problem
+    while (minScore > 0.5) {
+        // Pass the current generation and individual to the fitness function.
+        // Reset current individual for this population
+        userData.currentIndividual = 1;
+        // Set this before we call Step (which calls the fitness function) so
+        // add one to the current generation.
+        userData.currentGeneration = ga.GetCurrentGeneration() + 1;
 
-        std::cout << "Generation " << userData.currentGeneration
+        ga.Step();
+
+        std::cout << "Generation " << ga.GetCurrentGeneration()
                   << " => avg: " << ga.GetAverageScore()
-                  << " min: " << ga.GetMinScore()
-                  << " stdev: " << ga.GetScoreStdev()
+                  << " min: " << ga.GetMinimumScore()
+                  << " stdev: " << ga.GetScoreStandardDeviation()
                   << " popdiv: " << ga.GetPopulationDiversity()
                   << std::endl;
 
-        userData.generationalAverageScore[userData.currentGeneration] = ga.GetAverageScore();
-        userData.generationalMinimumScore[userData.currentGeneration] = ga.GetMinScore();
-        userData.generationalStandardDeviation[userData.currentGeneration] = ga.GetScoreStdev();
-        userData.generationalPopulationDiversity[userData.currentGeneration] = ga.GetPopulationDiversity();
-
-        ga.Step();
+        if (ga.GetMinimumScore() < minScore) {
+            minScore = ga.GetMinimumScore();
+        }
     }
 
     return 0;
