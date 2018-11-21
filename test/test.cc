@@ -54,6 +54,7 @@ int main(int argc, const char** argv) {
     ga.SetMutatorType(MutatorType::Flip);
     ga.SetSelectorType(SelectorType::Tournament);
     ga.SetTournamentSize(5);
+    ga.SetKPointCrossoverPointCount(5);
     ga.SetAllowSameParentCouples(true);
     ga.SetUserData(&userData);
     ga.Initialize();

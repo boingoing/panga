@@ -31,7 +31,7 @@ public:
 
     /**
      * Deep copy a BitVector.
-     * Resizes this.
+     * Resizes this to be the same size as rhs.
      */
     void operator=(const BitVector& rhs);
 

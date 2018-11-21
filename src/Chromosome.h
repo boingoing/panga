@@ -143,14 +143,14 @@ public:
         }
     }
 
-    template <unsigned int k = 2, bool ignoreGeneBoundaries = true>
-    static void KPointCrossover(Chromosome* parent1, Chromosome* parent2, Chromosome* offspring, RandomWrapper* randomWrapper) {
+    template <bool ignoreGeneBoundaries = true>
+    static void KPointCrossover(size_t k, Chromosome* parent1, Chromosome* parent2, Chromosome* offspring, RandomWrapper* randomWrapper) {
         size_t left = 0;
         size_t totalBits = ignoreGeneBoundaries ?
             parent1->GetBitCount() :
             parent1->_genome->GetGeneCount();
 
-        for (unsigned int i = 0; i < k + 1; i++) {
+        for (size_t i = 0; i < k + 1; i++) {
             // Copy a chunk of bits starting with left and ending at right.
             size_t right = randomWrapper->RandomInteger(left, totalBits);
 

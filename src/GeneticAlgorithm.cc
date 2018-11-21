@@ -22,8 +22,9 @@ GeneticAlgorithm::GeneticAlgorithm() :
     _mutatorType(MutatorType::Flip),
     _selectorType(SelectorType::RouletteWheel),
     _tournamentSize(2),
+    _kPointCrossoverPointCount(3),
     _crossoverIgnoreGeneBoundaries(true),
-    _allowSameParentCouples(false),
+    _allowSameParentCouples(true),
     _userData(nullptr),
     _fitnessFunction(nullptr) {
 }
@@ -53,8 +54,16 @@ void GeneticAlgorithm::SetMutationRate(double mutationRate) {
     this->_mutationRate = mutationRate;
 }
 
+double GeneticAlgorithm::GetMutationRate() {
+    return this->_mutationRate;
+}
+
 void GeneticAlgorithm::SetCrossoverRate(double crossoverRate) {
     this->_crossoverRate = crossoverRate;
+}
+
+double GeneticAlgorithm::GetCrossoverRate() {
+    return this->_crossoverRate;
 }
 
 void GeneticAlgorithm::SetPopulationSize(size_t populationSize) {
@@ -101,6 +110,10 @@ void GeneticAlgorithm::SetMutationRateSchedule(MutationRateSchedule mutationRate
     this->_mutationRateSchedule = mutationRateSchedule;
 }
 
+MutationRateSchedule GeneticAlgorithm::GetMutationRateSchedule() {
+    return this->_mutationRateSchedule;
+}
+
 void GeneticAlgorithm::SetUserData(void* userData) {
     this->_userData = userData;
 }
@@ -113,12 +126,24 @@ void GeneticAlgorithm::SetCrossoverType(CrossoverType crossoverType) {
     this->_crossoverType = crossoverType;
 }
 
+CrossoverType GeneticAlgorithm::GetCrossoverType() {
+    return this->_crossoverType;
+}
+
 void GeneticAlgorithm::SetMutatorType(MutatorType mutatorType) {
     this->_mutatorType = mutatorType;
 }
 
+MutatorType GeneticAlgorithm::GetMutatorType() {
+    return this->_mutatorType;
+}
+
 void GeneticAlgorithm::SetSelectorType(SelectorType selectorType) {
     this->_selectorType = selectorType;
+}
+
+SelectorType GeneticAlgorithm::GetSelectorType() {
+    return this->_selectorType;
 }
 
 void GeneticAlgorithm::SetCrossoverIgnoreGeneBoundaries(bool crossoverIgnoreGeneBoundaries) {
@@ -147,6 +172,14 @@ void GeneticAlgorithm::SetTournamentSize(size_t tournamentSize) {
 
 size_t GeneticAlgorithm::GetTournamentSize() {
     return this->_tournamentSize;
+}
+
+void GeneticAlgorithm::SetKPointCrossoverPointCount(size_t kPointCrossoverPointCount) {
+    this->_kPointCrossoverPointCount = kPointCrossoverPointCount;
+}
+
+size_t GeneticAlgorithm::GetKPointCrossoverPointCount() {
+    return this->_kPointCrossoverPointCount;
 }
 
 Individual* GeneticAlgorithm::GetBestIndividual() {
@@ -244,6 +277,9 @@ void GeneticAlgorithm::Initialize(const std::vector<const BitVector*>* initialPo
     while (this->_lastGenerationPopulation.size() < this->_populationSize) {
         this->_lastGenerationPopulation.push_back(new Individual(this->_genome));
     }
+
+    // Reset the current generation.
+    this->_currentGeneration = 0;
 }
 
 void GeneticAlgorithm::Step() {
@@ -371,34 +407,33 @@ double GeneticAlgorithm::GetCurrentMutationRate() {
     }
 }
 
-void GeneticAlgorithm::Crossover(Individual* parent1, Individual* parent2, Individual* offspring) {
-    assert(parent1->GetBitCount() == parent2->GetBitCount());
-
+template <bool ignoreGeneBoundaries>
+void GeneticAlgorithm::CrossoverInternal(Individual* parent1, Individual* parent2, Individual* offspring) {
     switch (this->_crossoverType) {
     case CrossoverType::OnePoint:
-        if (this->_crossoverIgnoreGeneBoundaries) {
-            Chromosome::KPointCrossover<1, true>(parent1, parent2, offspring, &this->_randomWrapper);
-        } else {
-            Chromosome::KPointCrossover<1, false>(parent1, parent2, offspring, &this->_randomWrapper);
-        }
+        Chromosome::KPointCrossover<ignoreGeneBoundaries>(1, parent1, parent2, offspring, &this->_randomWrapper);
         break;
     case CrossoverType::TwoPoint:
-        if (this->_crossoverIgnoreGeneBoundaries) {
-            Chromosome::KPointCrossover<2, true>(parent1, parent2, offspring, &this->_randomWrapper);
-        } else {
-            Chromosome::KPointCrossover<2, false>(parent1, parent2, offspring, &this->_randomWrapper);
-        }
+        Chromosome::KPointCrossover<ignoreGeneBoundaries>(2, parent1, parent2, offspring, &this->_randomWrapper);
+        break;
+    case CrossoverType::KPoint:
+        Chromosome::KPointCrossover<ignoreGeneBoundaries>(this->_kPointCrossoverPointCount, parent1, parent2, offspring, &this->_randomWrapper);
         break;
     case CrossoverType::Uniform:
-        if (this->_crossoverIgnoreGeneBoundaries) {
-            Chromosome::UniformCrossover<true>(parent1, parent2, offspring, &this->_randomWrapper);
-        } else {
-            Chromosome::UniformCrossover<false>(parent1, parent2, offspring, &this->_randomWrapper);
-        }
+        Chromosome::UniformCrossover<ignoreGeneBoundaries>(parent1, parent2, offspring, &this->_randomWrapper);
         break;
     default:
         assert(false);
-        break;
+    }
+}
+
+void GeneticAlgorithm::Crossover(Individual* parent1, Individual* parent2, Individual* offspring) {
+    assert(parent1->GetBitCount() == parent2->GetBitCount());
+
+    if (this->_crossoverIgnoreGeneBoundaries) {
+        this->CrossoverInternal<true>(parent1, parent2, offspring);
+    } else {
+        this->CrossoverInternal<false>(parent1, parent2, offspring);
     }
 }
 

@@ -14,6 +14,7 @@ class BitVector;
 enum class CrossoverType : uint8_t {
     OnePoint = 1,
     TwoPoint,
+    KPoint,
     Uniform
 };
 
@@ -61,6 +62,7 @@ protected:
     SelectorType _selectorType;
 
     size_t _tournamentSize;
+    size_t _kPointCrossoverPointCount;
 
     bool _crossoverIgnoreGeneBoundaries;
     bool _allowSameParentCouples;
@@ -79,9 +81,9 @@ public:
 
     /**
      * When we perform crossover, should we respect gene boundaries such that
-     * all of the bits making up a gene are copied from one parent? This could
-     * be useful if the bits underlying the gene don't make as much sense
-     * when they are split up.
+     * all of the bits making up a gene are copied from one parent?
+     * This could be useful if the bits underlying the gene don't make as
+     * much sense when they are split up.
      * If this flag is false, we will respect the boundary of each gene and
      * not split a gene up during crossover.
      * If this flag is true, we will ignore gene boundaries during crossover
@@ -92,23 +94,89 @@ public:
     void SetCrossoverIgnoreGeneBoundaries(bool crossoverIgnoreGeneBoundaries);
     bool GetCrossoverIgnoreGeneBoundaries();
 
+    /**
+     * When we choose parents to use for crossover, should we allow the same
+     * Individual to be used as both parents?
+     * This could be useful because crossover returns the same parent if both
+     * parents are identical.
+     * If this flag is false, we will not allow the same Individual to be
+     * selected as both parents when we select a couple for crossover.
+     * If this flag is true, it is possible that both parents in the
+     * couple selected for crossover will be the same Individual.
+     * This flag is true by default.
+     */
     void SetAllowSameParentCouples(bool allowSameParentCouples);
     bool GetAllowSameParentCouples();
 
+    /**
+     * Set the number of Individuals we should include in the tournament
+     * when using tournament selector.
+     */
     void SetTournamentSize(size_t tournamentSize);
     size_t GetTournamentSize();
 
+    /**
+     * Set the number of points we'll use to cut up the parent chromosomes
+     * during k-point crossover.
+     */
+    void SetKPointCrossoverPointCount(size_t kPointCrossoverPointCount);
+    size_t GetKPointCrossoverPointCount();
+
+    /**
+     * Set the total number of generations we want to evolve.
+     * If you call Run(), we will execute this many generations.
+     * If you manually call Step(), you can run more than total generations.
+     * This number is used to calculate mutation rate in some mutation
+     * rate schedules.
+     */
     void SetTotalGenerations(size_t totalGenerations);
     size_t GetTotalGenerations();
 
+    /**
+     * Set the mutation rate.
+     * After we perform crossover, mutate each offspring Individual by this
+     * rate according to the mutation operator.
+     * During execution, the actual mutation rate is calculated based on the
+     * mutation rate schedule.
+     * @see MutatorType
+     * @see MutationRateSchedule
+     * @see GetCurrentMutationRate
+     */
     void SetMutationRate(double mutationRate);
-    void SetCrossoverRate(double crossoverRate);
-    void SetCrossoverType(CrossoverType crossoverType);
-    void SetSelectorType(SelectorType selectorType);
+    double GetMutationRate();
 
+    /**
+     * Set the crossover rate.
+     * During each step, construct new individuals for the next generation.
+     * We will select two Individuals and perform crossover to produce the
+     * offspring in the next generation with a crossover rate chance.
+     * Instead of crossover, we will copy one Individual from the old
+     * population over into the new one with (1 - crossover rate) chance.
+     */
+    void SetCrossoverRate(double crossoverRate);
+    double GetCrossoverRate();
+
+    void SetCrossoverType(CrossoverType crossoverType);
+    CrossoverType GetCrossoverType();
+
+    void SetSelectorType(SelectorType selectorType);
+    SelectorType GetSelectorType();
+
+    /**
+     * When constructing the next generation, always copy some of the best
+     * Individuals from the current generation. These elite Individuals
+     * are copied as they are and are not crossed-over or mutated.
+     * @param eliteCount Number of elites.
+     */
     void SetEliteCount(size_t eliteCount);
     size_t GetEliteCount();
 
+    /**
+     * Mutated elites are the same as ordinary elite Individuals except they
+     * are subjected to the mutation operator according to
+     * mutatedEliteMutationRate.
+     * @see SetMutatedEliteMutationRate
+     */
     void SetMutatedEliteCount(size_t mutatedEliteCount);
     size_t GetMutatedEliteCount();
 
@@ -116,7 +184,10 @@ public:
     double GetMutatedEliteMutationRate();
 
     void SetMutationRateSchedule(MutationRateSchedule mutationRateSchedule);
+    MutationRateSchedule GetMutationRateSchedule();
+
     void SetMutatorType(MutatorType mutatorType);
+    MutatorType GetMutatorType();
 
     /**
      * Set some data which will be passed into the fitness function called to
@@ -133,6 +204,10 @@ public:
     void SetFitnessFunction(FitnessFunction fitnessFunction);
     FitnessFunction GetFitnessFunction();
 
+    /**
+     * Each generation, we will construct and evaluate populationSize
+     * Individuals.
+     */
     void SetPopulationSize(size_t populationSize);
     size_t GetPopulationSize();
 
@@ -231,6 +306,9 @@ protected:
      * Use the fitness function to score one Individual.
      */
     void Score(Individual* individual);
+
+    template <bool ignoreGeneBoundaries>
+    void CrossoverInternal(Individual* parent1, Individual* parent2, Individual* offspring);
 
     void Crossover(Individual* parent1, Individual* parent2, Individual* offspring);
     void Mutate(Individual* individual, double mutationPercentage);
