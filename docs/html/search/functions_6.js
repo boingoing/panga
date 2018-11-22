@@ -16,6 +16,7 @@ var searchData=
   ['getint',['GetInt',['../classpanga_1_1BitVector.html#a5d0d7d27a95f5774c11a3b8ba57213f5',1,'panga::BitVector']]],
   ['getminimumscore',['GetMinimumScore',['../classpanga_1_1GeneticAlgorithm.html#af3c2d5f24c373871614aa2ff80c07289',1,'panga::GeneticAlgorithm']]],
   ['getpopulationdiversity',['GetPopulationDiversity',['../classpanga_1_1GeneticAlgorithm.html#a573c741a7c511c58ca1ef0fad1935ee1',1,'panga::GeneticAlgorithm']]],
+  ['getrawgene',['GetRawGene',['../classpanga_1_1Chromosome.html#abe6e9d64ff7917fc68645dc6fa8bf804',1,'panga::Chromosome']]],
   ['getscore',['GetScore',['../classpanga_1_1Individual.html#a36191e0fc912a69339dba2923366f6e0',1,'panga::Individual']]],
   ['getscorestandarddeviation',['GetScoreStandardDeviation',['../classpanga_1_1GeneticAlgorithm.html#adcc513420e5c5808442c1d9c84932a22',1,'panga::GeneticAlgorithm']]]
 ];
