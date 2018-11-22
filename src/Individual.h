@@ -12,6 +12,9 @@ namespace panga {
 class BitVector;
 class Genome;
 
+/**
+ * An Individual is a Chromosome with a fitness score.
+ */
 class Individual : public Chromosome {
 protected:
     /**
@@ -33,11 +36,24 @@ public:
      */
     bool operator<(const Individual& rhs) const;
 
-    double GetFitness() const;
+    /**
+     * Get the score value returned from the fitness function when we called it
+     * with this Individual.<br/>
+     * A lower raw score indicates a more fit Individual.
+     */
     double GetScore() const;
-
-    void SetFitness(double fitness);
     void SetScore(double score);
+
+    /**
+     * Get the proportional fitness score calculated after we've scored all
+     * Individuals in the population with this one.<br/>
+     * A higher proportional fitness score indicates a more fit Individual.
+     */
+    double GetFitness() const;
+    void SetFitness(double fitness);
+
+protected:
+    Individual(const Individual&);
 };
 
 } // namespace panga

@@ -64,12 +64,15 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classpanga_1_1Individual-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">panga::Individual Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="Individual_8h_source.html">Individual.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for panga::Individual:</div>
 <div class="dyncontent">
@@ -97,18 +100,16 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a992e1be4b25607e63da4116748d70e21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71c5f6b196231ca033a93b4d2f3ad196"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpanga_1_1Individual.html#a71c5f6b196231ca033a93b4d2f3ad196">operator&lt;</a> (const <a class="el" href="classpanga_1_1Individual.html">Individual</a> &amp;rhs) const</td></tr>
 <tr class="separator:a71c5f6b196231ca033a93b4d2f3ad196"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3bb7e94d7a961d16683e35952790e7b"><td class="memItemLeft" align="right" valign="top"><a id="ab3bb7e94d7a961d16683e35952790e7b"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>GetFitness</b> () const</td></tr>
-<tr class="separator:ab3bb7e94d7a961d16683e35952790e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36191e0fc912a69339dba2923366f6e0"><td class="memItemLeft" align="right" valign="top"><a id="a36191e0fc912a69339dba2923366f6e0"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>GetScore</b> () const</td></tr>
+<tr class="memitem:a36191e0fc912a69339dba2923366f6e0"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpanga_1_1Individual.html#a36191e0fc912a69339dba2923366f6e0">GetScore</a> () const</td></tr>
 <tr class="separator:a36191e0fc912a69339dba2923366f6e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0550b5a588fba2529667b78b5247a966"><td class="memItemLeft" align="right" valign="top"><a id="a0550b5a588fba2529667b78b5247a966"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetFitness</b> (double fitness)</td></tr>
-<tr class="separator:a0550b5a588fba2529667b78b5247a966"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cdf81dd6d5f31ef846ff88f5332dbcb"><td class="memItemLeft" align="right" valign="top"><a id="a2cdf81dd6d5f31ef846ff88f5332dbcb"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetScore</b> (double score)</td></tr>
 <tr class="separator:a2cdf81dd6d5f31ef846ff88f5332dbcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3bb7e94d7a961d16683e35952790e7b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpanga_1_1Individual.html#ab3bb7e94d7a961d16683e35952790e7b">GetFitness</a> () const</td></tr>
+<tr class="separator:ab3bb7e94d7a961d16683e35952790e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0550b5a588fba2529667b78b5247a966"><td class="memItemLeft" align="right" valign="top"><a id="a0550b5a588fba2529667b78b5247a966"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetFitness</b> (double fitness)</td></tr>
+<tr class="separator:a0550b5a588fba2529667b78b5247a966"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classpanga_1_1Chromosome"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classpanga_1_1Chromosome')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classpanga_1_1Chromosome.html">panga::Chromosome</a></td></tr>
 <tr class="memitem:a0867ef790a7044cd9063fc65509f2740 inherit pub_methods_classpanga_1_1Chromosome"><td class="memItemLeft" align="right" valign="top"><a id="a0867ef790a7044cd9063fc65509f2740"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Chromosome</b> (const <a class="el" href="classpanga_1_1Genome.html">Genome</a> *genome)</td></tr>
@@ -193,6 +194,20 @@ std::byte *&#160;</td><td class="memItemRight" valign="bottom"><b>GetRawGene</b>
 <tr class="memitem:abeb1c56528dcc02e40711547f9309fe4 inherit pub_methods_classpanga_1_1BitVector"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpanga_1_1BitVector.html#abeb1c56528dcc02e40711547f9309fe4">FromHexString</a> (const char *buffer, size_t bufferLength)</td></tr>
 <tr class="separator:abeb1c56528dcc02e40711547f9309fe4 inherit pub_methods_classpanga_1_1BitVector"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a7b5d7bb4eecd488e057f8b0b57c67945"><td class="memItemLeft" align="right" valign="top"><a id="a7b5d7bb4eecd488e057f8b0b57c67945"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Individual</b> (const <a class="el" href="classpanga_1_1Individual.html">Individual</a> &amp;)</td></tr>
+<tr class="separator:a7b5d7bb4eecd488e057f8b0b57c67945"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classpanga_1_1Chromosome"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classpanga_1_1Chromosome')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classpanga_1_1Chromosome.html">panga::Chromosome</a></td></tr>
+<tr class="memitem:af71adda5a66d4894c0d7bf8f8734ef5a inherit pro_methods_classpanga_1_1Chromosome"><td class="memItemLeft" align="right" valign="top"><a id="af71adda5a66d4894c0d7bf8f8734ef5a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Chromosome</b> (const <a class="el" href="classpanga_1_1Chromosome.html">Chromosome</a> &amp;)</td></tr>
+<tr class="separator:af71adda5a66d4894c0d7bf8f8734ef5a inherit pro_methods_classpanga_1_1Chromosome"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classpanga_1_1BitVector"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classpanga_1_1BitVector')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classpanga_1_1BitVector.html">panga::BitVector</a></td></tr>
+<tr class="memitem:aaf1eee8f25ed3e72c0da8d111f3fa9ab inherit pro_methods_classpanga_1_1BitVector"><td class="memItemLeft" align="right" valign="top"><a id="aaf1eee8f25ed3e72c0da8d111f3fa9ab"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Resize</b> (size_t bitCount)</td></tr>
+<tr class="separator:aaf1eee8f25ed3e72c0da8d111f3fa9ab inherit pro_methods_classpanga_1_1BitVector"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a95a603882b5189444782cc507ae6a98a"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpanga_1_1Individual.html#a95a603882b5189444782cc507ae6a98a">_fitness</a></td></tr>
@@ -239,10 +254,6 @@ template&lt;bool ignoreGeneBoundaries = true&gt; </td></tr>
 <tr class="memitem:afaba746e291741c2119686af01093a06 inherit pub_static_methods_classpanga_1_1Chromosome"><td class="memItemLeft" align="right" valign="top"><a id="afaba746e291741c2119686af01093a06"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>FlipMutator</b> (<a class="el" href="classpanga_1_1Chromosome.html">Chromosome</a> *chromosome, double mutationPercentage, <a class="el" href="classpanga_1_1RandomWrapper.html">RandomWrapper</a> *randomWrapper)</td></tr>
 <tr class="separator:afaba746e291741c2119686af01093a06 inherit pub_static_methods_classpanga_1_1Chromosome"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classpanga_1_1BitVector"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classpanga_1_1BitVector')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classpanga_1_1BitVector.html">panga::BitVector</a></td></tr>
-<tr class="memitem:aaf1eee8f25ed3e72c0da8d111f3fa9ab inherit pro_methods_classpanga_1_1BitVector"><td class="memItemLeft" align="right" valign="top"><a id="aaf1eee8f25ed3e72c0da8d111f3fa9ab"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Resize</b> (size_t bitCount)</td></tr>
-<tr class="separator:aaf1eee8f25ed3e72c0da8d111f3fa9ab inherit pro_methods_classpanga_1_1BitVector"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_classpanga_1_1BitVector"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classpanga_1_1BitVector')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classpanga_1_1BitVector.html">panga::BitVector</a></td></tr>
 <tr class="memitem:ae6802f7afadfec6b53c41b6e67cabffb inherit pro_static_methods_classpanga_1_1BitVector"><td class="memItemLeft" align="right" valign="top"><a id="ae6802f7afadfec6b53c41b6e67cabffb"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><b>Compare</b> (std::byte *left, std::byte *right, size_t bitsToCompare)</td></tr>
@@ -259,7 +270,47 @@ template&lt;typename IntegerType  = uint64_t&gt; </td></tr>
 <tr class="memitem:a9addca31da455b1b98d42b32f37a0c9b inherit pro_static_methods_classpanga_1_1BitVector"><td class="memTemplItemLeft" align="right" valign="top">static IntegerType&#160;</td><td class="memTemplItemRight" valign="bottom"><b>ReadInt</b> (std::byte *bytes, size_t bitIndex, size_t bitWidth)</td></tr>
 <tr class="separator:a9addca31da455b1b98d42b32f37a0c9b inherit pro_static_methods_classpanga_1_1BitVector"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>An <a class="el" href="classpanga_1_1Individual.html">Individual</a> is a <a class="el" href="classpanga_1_1Chromosome.html">Chromosome</a> with a fitness score. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab3bb7e94d7a961d16683e35952790e7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3bb7e94d7a961d16683e35952790e7b">&#9670;&nbsp;</a></span>GetFitness()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Individual::GetFitness </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the proportional fitness score calculated after we've scored all Individuals in the population with this one.<br />
+ A higher proportional fitness score indicates a more fit <a class="el" href="classpanga_1_1Individual.html">Individual</a>. </p>
+
+</div>
+</div>
+<a id="a36191e0fc912a69339dba2923366f6e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36191e0fc912a69339dba2923366f6e0">&#9670;&nbsp;</a></span>GetScore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Individual::GetScore </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the score value returned from the fitness function when we called it with this <a class="el" href="classpanga_1_1Individual.html">Individual</a>.<br />
+ A lower raw score indicates a more fit <a class="el" href="classpanga_1_1Individual.html">Individual</a>. </p>
+
+</div>
+</div>
 <a id="a71c5f6b196231ca033a93b4d2f3ad196"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a71c5f6b196231ca033a93b4d2f3ad196">&#9670;&nbsp;</a></span>operator<()</h2>
 

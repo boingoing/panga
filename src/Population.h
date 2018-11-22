@@ -12,6 +12,14 @@ namespace panga {
 class Individual;
 class RandomWrapper;
 
+/**
+ * Just a collection of Individual objects.<br/>
+ * We can select Individuals from this population according to their
+ * fitness values.<br/>
+ * Note: In order for the select functions to work correctly, the population
+ * must be sorted in decreasing fitness order with the Individual at index 0
+ * being the most fit.
+ */
 class Population : public std::vector<Individual*> {
 protected:
     std::vector<double> _partialSums;

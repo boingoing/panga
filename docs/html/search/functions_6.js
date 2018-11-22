@@ -6,11 +6,16 @@ var searchData=
   ['getbitcount',['GetBitCount',['../classpanga_1_1BitVector.html#aa28973b8cdecffa804350e7a4295a6be',1,'panga::BitVector']]],
   ['getbooleangenecount',['GetBooleanGeneCount',['../classpanga_1_1Genome.html#a8a2f7f6c10a0e96addd4a71a84d699cf',1,'panga::Genome']]],
   ['getcurrentgeneration',['GetCurrentGeneration',['../classpanga_1_1GeneticAlgorithm.html#a40cbc10412d0bcc71f1b9bc2a6d1ebaf',1,'panga::GeneticAlgorithm']]],
+  ['getfirstbooleangenebitindex',['GetFirstBooleanGeneBitIndex',['../classpanga_1_1Genome.html#a56f745762146d7579823b54d4acdbc9f',1,'panga::Genome']]],
+  ['getfirstbooleangeneindex',['GetFirstBooleanGeneIndex',['../classpanga_1_1Genome.html#af5432ac15e82a2c8693affa88375b202',1,'panga::Genome']]],
+  ['getfitness',['GetFitness',['../classpanga_1_1Individual.html#ab3bb7e94d7a961d16683e35952790e7b',1,'panga::Individual']]],
   ['getgenebitwitdh',['GetGeneBitWitdh',['../classpanga_1_1Genome.html#ac9db69ece5360c5eaa94c9cbc8b5d0b6',1,'panga::Genome']]],
+  ['getgenecount',['GetGeneCount',['../classpanga_1_1Genome.html#a0440fd8216d128563f22e1d4e1d17303',1,'panga::Genome']]],
   ['getgenestartbitindex',['GetGeneStartBitIndex',['../classpanga_1_1Genome.html#a81ef777300e2c0861c69de1421baab8c',1,'panga::Genome']]],
   ['getindividual',['GetIndividual',['../classpanga_1_1GeneticAlgorithm.html#a0791b5149f23eb2c397592d8db5ebe19',1,'panga::GeneticAlgorithm']]],
   ['getint',['GetInt',['../classpanga_1_1BitVector.html#a5d0d7d27a95f5774c11a3b8ba57213f5',1,'panga::BitVector']]],
   ['getminimumscore',['GetMinimumScore',['../classpanga_1_1GeneticAlgorithm.html#af3c2d5f24c373871614aa2ff80c07289',1,'panga::GeneticAlgorithm']]],
   ['getpopulationdiversity',['GetPopulationDiversity',['../classpanga_1_1GeneticAlgorithm.html#a573c741a7c511c58ca1ef0fad1935ee1',1,'panga::GeneticAlgorithm']]],
+  ['getscore',['GetScore',['../classpanga_1_1Individual.html#a36191e0fc912a69339dba2923366f6e0',1,'panga::Individual']]],
   ['getscorestandarddeviation',['GetScoreStandardDeviation',['../classpanga_1_1GeneticAlgorithm.html#adcc513420e5c5808442c1d9c84932a22',1,'panga::GeneticAlgorithm']]]
 ];
