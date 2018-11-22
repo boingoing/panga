@@ -12,6 +12,6 @@ set (SOURCES ${PROJECT_SOURCE_DIR}/src/GeneticAlgorithm.cc
 	     ${PROJECT_SOURCE_DIR}/test/test.cc)
 
 set (CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall")
 
 add_executable (panga_test ${SOURCES})
