@@ -65,12 +65,15 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classpanga_1_1Chromosome-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">panga::Chromosome Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="Chromosome_8h_source.html">Chromosome.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for panga::Chromosome:</div>
 <div class="dyncontent">
@@ -203,6 +206,16 @@ template&lt;bool ignoreGeneBoundaries = true&gt; </td></tr>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>FlipMutator</b> (<a class="el" href="classpanga_1_1Chromosome.html">Chromosome</a> *chromosome, double mutationPercentage, <a class="el" href="classpanga_1_1RandomWrapper.html">RandomWrapper</a> *randomWrapper)</td></tr>
 <tr class="separator:afaba746e291741c2119686af01093a06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:af71adda5a66d4894c0d7bf8f8734ef5a"><td class="memItemLeft" align="right" valign="top"><a id="af71adda5a66d4894c0d7bf8f8734ef5a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Chromosome</b> (const <a class="el" href="classpanga_1_1Chromosome.html">Chromosome</a> &amp;)</td></tr>
+<tr class="separator:af71adda5a66d4894c0d7bf8f8734ef5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classpanga_1_1BitVector"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classpanga_1_1BitVector')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classpanga_1_1BitVector.html">panga::BitVector</a></td></tr>
+<tr class="memitem:aaf1eee8f25ed3e72c0da8d111f3fa9ab inherit pro_methods_classpanga_1_1BitVector"><td class="memItemLeft" align="right" valign="top"><a id="aaf1eee8f25ed3e72c0da8d111f3fa9ab"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Resize</b> (size_t bitCount)</td></tr>
+<tr class="separator:aaf1eee8f25ed3e72c0da8d111f3fa9ab inherit pro_methods_classpanga_1_1BitVector"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a6b82b12eb66b2a32053bb93a593f5264"><td class="memItemLeft" align="right" valign="top"><a id="a6b82b12eb66b2a32053bb93a593f5264"></a>
@@ -218,10 +231,6 @@ const <a class="el" href="classpanga_1_1Genome.html">Genome</a> *&#160;</td><td 
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_methods_classpanga_1_1BitVector"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classpanga_1_1BitVector')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classpanga_1_1BitVector.html">panga::BitVector</a></td></tr>
-<tr class="memitem:aaf1eee8f25ed3e72c0da8d111f3fa9ab inherit pro_methods_classpanga_1_1BitVector"><td class="memItemLeft" align="right" valign="top"><a id="aaf1eee8f25ed3e72c0da8d111f3fa9ab"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Resize</b> (size_t bitCount)</td></tr>
-<tr class="separator:aaf1eee8f25ed3e72c0da8d111f3fa9ab inherit pro_methods_classpanga_1_1BitVector"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_classpanga_1_1BitVector"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classpanga_1_1BitVector')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classpanga_1_1BitVector.html">panga::BitVector</a></td></tr>
 <tr class="memitem:ae6802f7afadfec6b53c41b6e67cabffb inherit pro_static_methods_classpanga_1_1BitVector"><td class="memItemLeft" align="right" valign="top"><a id="ae6802f7afadfec6b53c41b6e67cabffb"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><b>Compare</b> (std::byte *left, std::byte *right, size_t bitsToCompare)</td></tr>
@@ -238,7 +247,11 @@ template&lt;typename IntegerType  = uint64_t&gt; </td></tr>
 <tr class="memitem:a9addca31da455b1b98d42b32f37a0c9b inherit pro_static_methods_classpanga_1_1BitVector"><td class="memTemplItemLeft" align="right" valign="top">static IntegerType&#160;</td><td class="memTemplItemRight" valign="bottom"><b>ReadInt</b> (std::byte *bytes, size_t bitIndex, size_t bitWidth)</td></tr>
 <tr class="separator:a9addca31da455b1b98d42b32f37a0c9b inherit pro_static_methods_classpanga_1_1BitVector"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The binary data acting as an instance of a <a class="el" href="classpanga_1_1Genome.html">Genome</a>.<br />
+ Length of <a class="el" href="classpanga_1_1Chromosome.html">Chromosome</a> in bits will be the same as the bits required to encode the <a class="el" href="classpanga_1_1Genome.html">Genome</a>.<br />
+ With the <a class="el" href="classpanga_1_1Genome.html">Genome</a>, we know where all the genes are located in our binary data and we can interpret the bits making up each gene. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classpanga_1_1Genome.html">Genome</a> </dd></dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a9733562fdbd4cb117ae332cc9611fe2e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9733562fdbd4cb117ae332cc9611fe2e">&#9670;&nbsp;</a></span>DecodeGray()</h2>
 

@@ -14,6 +14,14 @@
 
 namespace panga {
 
+/**
+ * The binary data acting as an instance of a Genome.<br/>
+ * Length of Chromosome in bits will be the same as the bits required to
+ * encode the Genome.<br/>
+ * With the Genome, we know where all the genes are located in our binary data
+ * and we can interpret the bits making up each gene.
+ * @see Genome
+ */
 class Chromosome : public BitVector {
 protected:
     const Genome* _genome;
@@ -185,6 +193,9 @@ public:
     }
 
     static void FlipMutator(Chromosome* chromosome, double mutationPercentage, RandomWrapper* randomWrapper);
+
+protected:
+    Chromosome(const Chromosome&);
 };
 
 } // namespace panga

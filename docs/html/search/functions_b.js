@@ -4,6 +4,7 @@ var searchData=
   ['set',['Set',['../classpanga_1_1BitVector.html#a683d7488739651c7356b5042058af96e',1,'panga::BitVector']]],
   ['setallowsameparentcouples',['SetAllowSameParentCouples',['../classpanga_1_1GeneticAlgorithm.html#a56014a62f4853e76701abbdc3db0cb18',1,'panga::GeneticAlgorithm']]],
   ['setbitcount',['SetBitCount',['../classpanga_1_1BitVector.html#aa1085986cc6e3439af35b92cd77b35b7',1,'panga::BitVector']]],
+  ['setbooleangenecount',['SetBooleanGeneCount',['../classpanga_1_1Genome.html#adf73367588c8932a4379e9d2d92d02ff',1,'panga::Genome']]],
   ['setcrossoverignoregeneboundaries',['SetCrossoverIgnoreGeneBoundaries',['../classpanga_1_1GeneticAlgorithm.html#af5db5af0bac1cd2923cfc8dab414ba59',1,'panga::GeneticAlgorithm']]],
   ['setcrossoverrate',['SetCrossoverRate',['../classpanga_1_1GeneticAlgorithm.html#a4a3351748f07e44a99e86a6ac0f85f27',1,'panga::GeneticAlgorithm']]],
   ['setcrossovertype',['SetCrossoverType',['../classpanga_1_1GeneticAlgorithm.html#a070d1761aaa17dd6554cc23a0dc34f97',1,'panga::GeneticAlgorithm']]],
