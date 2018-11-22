@@ -1,3 +1,5 @@
+[![master build status](https://travis-ci.org/boingoing/panga.svg?branch=master)](https://travis-ci.org/boingoing/panga/builds#)
+
 # panga
 
 A simple, portable, and efficient genetic algorithm library.
