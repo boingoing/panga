@@ -37,6 +37,17 @@ public:
      */
     void Randomize(RandomWrapper* randomWrapper);
 
+    /**
+     * Fetch the binary data representing a gene and interpret it as an integer
+     * scaled between min and max.<br/>
+     * If useGrayEncoding is true, we will treat the gene data as a gray-coded
+     * number and decode it into a binary representation before scaling.
+     * @param geneIndex The index of the gene we should interpret.
+     * @param min The min value which the integer could assume.
+     * @param max The max value which the integer could assume.
+     * @return Integer representation of the gene in this Chromosome at
+     * geneIndex.
+     */
     template <typename IntegerType = uint64_t, bool useGrayEncoding = true>
     IntegerType DecodeIntegerGene(size_t geneIndex, IntegerType min = 0, IntegerType max = std::numeric_limits<IntegerType>::max()) {
         if (min == max) {
@@ -55,6 +66,14 @@ public:
         return (value % (max - min)) + min;
     }
 
+    /**
+     * Take an integer value and encode it into the binary data representing
+     * a gene in the Chromosome.<br/>
+     * If useGrayEncoding is true, we will encode the integer into a gray-coded
+     * value before writing it into the gene data.
+     * @param geneIndex The index of the gene we should write to.
+     * @param value The integer value we want to write into the Chromosome.
+     */
     template <typename IntegerType = uint64_t, bool useGrayEncoding = true>
     void EncodeIntegerGene(size_t geneIndex, IntegerType value) {
         size_t geneStartIndex = this->_genome->GetGeneStartBitIndex(geneIndex);
@@ -68,6 +87,17 @@ public:
         this->SetInt<IntegerType>(value, geneStartIndex, geneWidth);
     }
 
+    /**
+     * Fetch the binary data representing a gene and interpret it as a floating
+     * point number scaled between min and max.<br/>
+     * If useGrayEncoding is true, we will treat the gene data as a gray-coded
+     * number and decode it into a binary representation before scaling.
+     * @param geneIndex The index of the gene we should interpret.
+     * @param min The min value which the float could assume.
+     * @param max The max value which the float could assume.
+     * @return Floating point representation of the gene in this Chromosome at
+     * geneIndex.
+     */
     template <typename FloatType = double, bool useGrayEncoding = true>
     FloatType DecodeFloatGene(size_t geneIndex, FloatType min, FloatType max) {
         uint64_t integerValue = this->DecodeIntegerGene<uint64_t, useGrayEncoding>(geneIndex);
@@ -75,6 +105,15 @@ public:
         return DecodeFloat<FloatType, uint64_t>(integerValue, geneWidth, min, max);
     }
 
+    /**
+     * Take a floating point value and encode it into the binary data
+     * representing a gene in the Chromosome.<br/>
+     * If useGrayEncoding is true, we will encode value into a gray-coded
+     * value before writing it into the gene data.
+     * @param geneIndex The index of the gene we should write to.
+     * @param value The floating point value we want to write into the
+     * Chromosome.
+     */
     template <typename FloatType = double, bool useGrayEncoding = true>
     void EncodeFloatGene(size_t geneIndex, FloatType value, FloatType min, FloatType max) {
         size_t geneWidth = this->_genome->GetGeneBitWitdh(geneIndex);
@@ -82,10 +121,29 @@ public:
         EncodeIntegerGene<uint64_t, useGrayEncoding>(geneIndex, integerValue);
     }
 
+    /**
+     * Return true if the gene at geneIndex is set and false if the gene is
+     * not set.<br/>
+     * Note: geneIndex must be the index of a boolean gene and not a gene
+     * with a bit width - even if that bit width is 1.
+     */
     bool DecodeBooleanGene(size_t geneIndex);
 
+    /**
+     * Set the bit value at geneIndex.<br/>
+     * Note: geneIndex must be the index of a boolean gene and not a gene
+     * with a bit width - even if that bit width is 1.
+     * @param value If true, the bit at geneIndex is set. If false, the bit
+     * at geneIndex is unset.
+     */
     void EncodeBooleanGene(size_t geneIndex, bool value);
 
+    /**
+     * Get the raw binary data from the Chromosome where the gene at geneIndex
+     * is located. Doesn't interpret the binary data.
+     * @param geneBitWidth An out param which receives the bit width of the
+     * gene at geneIndex.
+     */
     std::byte* GetRawGene(size_t geneIndex, size_t* geneBitWidth);
 
     /**
@@ -112,6 +170,14 @@ public:
         return binaryValue ^ (binaryValue >> 1);
     }
 
+    /**
+     * Decode a floating point number from an integer representation.
+     * @param integerValue The integer representation we will decode.
+     * @param bitWidth How many bits of integerValue do we want to decode.
+     * @param min Min value for the float.
+     * @param max Max value for the float.
+     * @see EncodeFloat
+     */
     template <typename FloatType = double, typename IntegerType = uint64_t>
     static FloatType DecodeFloat(IntegerType integerValue, size_t bitWidth, FloatType min, FloatType max) {
         auto localMax = std::numeric_limits<IntegerType>::max() >> (sizeof(IntegerType) * 8 - bitWidth);
@@ -119,6 +185,15 @@ public:
         return factor * (max - min) + min;
     }
 
+    /**
+     * Encode a floating point number into an integer representation.
+     * @param floatVal Float value to encode.
+     * @param bitWidth How many bits should we limit the integer representation
+     * to.
+     * @param min Min value for the float.
+     * @param max Max value for the float.
+     * @see DecodeFloat
+     */
     template <typename FloatType = double, typename IntegerType = uint64_t>
     static IntegerType EncodeFloat(FloatType floatVal, size_t bitWidth, FloatType min, FloatType max) {
         auto localMax = std::numeric_limits<IntegerType>::max() >> (sizeof(IntegerType) * 8 - bitWidth);
