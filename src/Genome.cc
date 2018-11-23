@@ -30,31 +30,27 @@ size_t Genome::GetFirstBooleanGeneBitIndex() const {
 }
 
 size_t Genome::GetFirstBooleanGeneIndex() const {
-    assert(this->_geneStartBitIndex.size() == this->_geneBitWidth.size());
-    
-    return this->_geneStartBitIndex.size();
+    return this->_genes.size();
 }
 
 size_t Genome::GetGeneCount() const {
-    assert(this->_geneStartBitIndex.size() == this->_geneBitWidth.size());
-
-    return this->_geneStartBitIndex.size() + this->_booleanGeneCount;
+    return this->_genes.size() + this->_booleanGeneCount;
 }
 
 size_t Genome::GetGeneStartBitIndex(size_t geneIndex) const {
     assert(geneIndex < this->GetGeneCount());
 
-    return geneIndex >= this->_geneStartBitIndex.size() ?
-        this->_firstBooleanGeneBitIndex + this->_geneStartBitIndex.size() - geneIndex
-        : this->_geneStartBitIndex[geneIndex];
+    return geneIndex >= this->_genes.size() ?
+        this->_firstBooleanGeneBitIndex + this->_genes.size() - geneIndex
+        : this->_genes[geneIndex].startBitIndex;
 }
 
 size_t Genome::GetGeneBitWitdh(size_t geneIndex) const {
     assert(geneIndex < this->GetGeneCount());
 
-    return geneIndex >= this->_geneBitWidth.size() ?
+    return geneIndex >= this->_genes.size() ?
         1
-        : this->_geneBitWidth[geneIndex];
+        : this->_genes[geneIndex].bitWidth;
 }
 
 size_t Genome::GetBooleanGeneCount() const {
@@ -62,11 +58,10 @@ size_t Genome::GetBooleanGeneCount() const {
 }
 
 size_t Genome::BitsRequired() const {
-    assert(this->_geneStartBitIndex.size() == this->_geneBitWidth.size());
-
-    if (this->_geneStartBitIndex.empty()) {
+    if (this->_genes.empty()) {
         return this->_booleanGeneCount;
     }
 
-    return this->_geneStartBitIndex.back() + this->_geneBitWidth.back() + this->_booleanGeneCount;
+    const Gene& gene = this->_genes.back();
+    return gene.startBitIndex + gene.bitWidth + this->_booleanGeneCount;
 }
