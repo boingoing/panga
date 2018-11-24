@@ -27,8 +27,12 @@ namespace panga {
  */
 class Genome {
 protected:
-    std::vector<size_t> _geneStartBitIndex;
-    std::vector<size_t> _geneBitWidth;
+    struct Gene {
+        size_t startBitIndex;
+        size_t bitWidth;
+    };
+
+    std::vector<Gene> _genes;
     size_t _firstBooleanGeneBitIndex;
     size_t _booleanGeneCount;
 
@@ -50,13 +54,14 @@ public:
     template <bool byteAlign = false>
     size_t AddGene(size_t geneBitWidth) {
         assert(geneBitWidth != 0);
-        assert(this->_geneStartBitIndex.size() == this->_geneBitWidth.size());
 
         // First gene starts at bit index 0.
         // Subsequent genes start at the previous index + the previous bit width.
-        size_t geneBitStartIndex = this->_geneStartBitIndex.empty() ?
-            0 :
-            this->_geneStartBitIndex.back() + this->_geneBitWidth.back();
+        size_t geneBitStartIndex = 0;
+        if (!this->_genes.empty()) {
+            const Gene& gene = this->_genes.back();
+            geneBitStartIndex = gene.startBitIndex + gene.bitWidth;
+        }
 
         // Align the bits underlying the gene such that it begins and ends at a byte border.
         if (byteAlign) {
@@ -70,14 +75,14 @@ public:
             }
         }
 
-        this->_geneStartBitIndex.push_back(geneBitStartIndex);
-        this->_geneBitWidth.push_back(geneBitWidth);
+        size_t geneIndex = this->_genes.size();
+        this->_genes.push_back({geneBitStartIndex,geneBitWidth});
 
         // Boolean genes are always at the end of the chromosome.
         // Update the bit index for the start of the boolean genes.
         this->_firstBooleanGeneBitIndex = geneBitStartIndex + geneBitWidth;
 
-        return this->_geneStartBitIndex.size() - 1;
+        return geneIndex;
     }
 
     /**
