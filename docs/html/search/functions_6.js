@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['get',['Get',['../classpanga_1_1BitVector.html#aa38200cf8c80bfa54f79e65bcf85776f',1,'panga::BitVector']]],
+  ['get',['Get',['../classpanga_1_1BitVector.html#a226d5729a07ba273947bf51403a8fa34',1,'panga::BitVector']]],
   ['getaveragescore',['GetAverageScore',['../classpanga_1_1GeneticAlgorithm.html#a78e68efaff7967fb5937b680f3966353',1,'panga::GeneticAlgorithm']]],
   ['getbestindividual',['GetBestIndividual',['../classpanga_1_1GeneticAlgorithm.html#aaf9685a149c8c2102e9ccc54c43d09b4',1,'panga::GeneticAlgorithm']]],
   ['getbitcount',['GetBitCount',['../classpanga_1_1BitVector.html#aa28973b8cdecffa804350e7a4295a6be',1,'panga::BitVector']]],
@@ -13,7 +13,7 @@ var searchData=
   ['getgenecount',['GetGeneCount',['../classpanga_1_1Genome.html#a0440fd8216d128563f22e1d4e1d17303',1,'panga::Genome']]],
   ['getgenestartbitindex',['GetGeneStartBitIndex',['../classpanga_1_1Genome.html#a81ef777300e2c0861c69de1421baab8c',1,'panga::Genome']]],
   ['getindividual',['GetIndividual',['../classpanga_1_1GeneticAlgorithm.html#a0791b5149f23eb2c397592d8db5ebe19',1,'panga::GeneticAlgorithm']]],
-  ['getint',['GetInt',['../classpanga_1_1BitVector.html#a5d0d7d27a95f5774c11a3b8ba57213f5',1,'panga::BitVector']]],
+  ['getint',['GetInt',['../classpanga_1_1BitVector.html#a210931582e4a41df59be9b40efdc71ab',1,'panga::BitVector']]],
   ['getminimumscore',['GetMinimumScore',['../classpanga_1_1GeneticAlgorithm.html#af3c2d5f24c373871614aa2ff80c07289',1,'panga::GeneticAlgorithm']]],
   ['getpopulationdiversity',['GetPopulationDiversity',['../classpanga_1_1GeneticAlgorithm.html#a573c741a7c511c58ca1ef0fad1935ee1',1,'panga::GeneticAlgorithm']]],
   ['getrawgene',['GetRawGene',['../classpanga_1_1Chromosome.html#abe6e9d64ff7917fc68645dc6fa8bf804',1,'panga::Chromosome']]],

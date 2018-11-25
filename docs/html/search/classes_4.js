@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['population',['Population',['../classpanga_1_1Population.html',1,'panga']]]
+  ['individual',['Individual',['../classpanga_1_1Individual.html',1,'panga']]]
 ];

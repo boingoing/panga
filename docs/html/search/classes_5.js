@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['randomwrapper',['RandomWrapper',['../classpanga_1_1RandomWrapper.html',1,'panga']]]
+  ['population',['Population',['../classpanga_1_1Population.html',1,'panga']]]
 ];

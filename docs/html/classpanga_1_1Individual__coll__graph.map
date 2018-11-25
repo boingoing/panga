@@ -1,5 +1,6 @@
 <map id="panga::Individual" name="panga::Individual">
-<area shape="rect" id="node2" href="$classpanga_1_1Chromosome.html" title="panga::Chromosome" alt="" coords="67,95,225,121"/>
-<area shape="rect" id="node3" href="$classpanga_1_1BitVector.html" title="panga::BitVector" alt="" coords="5,5,135,32"/>
-<area shape="rect" id="node4" href="$classpanga_1_1Genome.html" title="panga::Genome" alt="" coords="159,5,285,32"/>
+<area shape="rect" id="node2" href="$classpanga_1_1Chromosome.html" title="panga::Chromosome" alt="" coords="106,184,249,211"/>
+<area shape="rect" id="node3" href="$classpanga_1_1BitVector.html" title="panga::BitVector" alt="" coords="47,95,166,121"/>
+<area shape="rect" id="node4" href="$structpanga_1_1BitVector_1_1HexFormat__t.html" title="panga::BitVector::HexFormat_t" alt="" coords="5,5,208,32"/>
+<area shape="rect" id="node5" href="$classpanga_1_1Genome.html" title="panga::Genome" alt="" coords="191,95,305,121"/>
 </map>

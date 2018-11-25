@@ -29,5 +29,5 @@ var searchData=
   ['settournamentsize',['SetTournamentSize',['../classpanga_1_1GeneticAlgorithm.html#ad6deca0de2a42a646a5d2b48f83a12b6',1,'panga::GeneticAlgorithm']]],
   ['setuserdata',['SetUserData',['../classpanga_1_1GeneticAlgorithm.html#af2f1560069922de9478b57e6d6960b93',1,'panga::GeneticAlgorithm']]],
   ['step',['Step',['../classpanga_1_1GeneticAlgorithm.html#a86aaa0a83bc03d318d0c6a4d30c9dbeb',1,'panga::GeneticAlgorithm']]],
-  ['subvector',['SubVector',['../classpanga_1_1BitVector.html#a048ed47d9a21d781f4a341aadba14f0d',1,'panga::BitVector']]]
+  ['subvector',['SubVector',['../classpanga_1_1BitVector.html#abd85aed37eaea4d19e5da0e9b27d0672',1,'panga::BitVector']]]
 ];
