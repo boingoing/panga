@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 
 namespace panga {
 
@@ -44,12 +45,12 @@ public:
      * Calculate equality between two BitVectors.<br/>
      * @param bitsToCompare Limit comparision to only the first bitsToCompare bits.
      */
-    bool Equals(const BitVector* rhs, size_t bitsToCompare);
+    bool Equals(const BitVector* rhs, size_t bitsToCompare) const;
 
     /**
      * Calculate equality between two BitVectors.
      */
-    bool Equals(const BitVector* rhs);
+    bool Equals(const BitVector* rhs) const;
 
     /**
      * Set the number of bits in the BitVector.<br/>
@@ -91,7 +92,7 @@ public:
      * @param index The index of the bit to get.
      * @return true if bit is set.
      */
-    bool Get(size_t index);
+    bool Get(size_t index) const;
 
     /**
      * Flip one bit in the BitVector.
@@ -105,7 +106,7 @@ public:
      * @param bitWidth Number of bits to use in constructing the integer.
      */
     template <typename IntegerType = uint64_t>
-    IntegerType GetInt(size_t bitIndex, size_t bitWidth) {
+    IntegerType GetInt(size_t bitIndex, size_t bitWidth) const {
         assert((bitIndex + bitWidth) <= this->_bitCount);
         return ReadInt<IntegerType>(this->_bytes, bitIndex, bitWidth);
     }
@@ -130,22 +131,23 @@ public:
      * @param sourceStartIndex Bit index into this where we will start copying.
      * @param bitWidth Count of bits we should copy.
      */
-    void SubVector(BitVector* destination, size_t destinationStartIndex, size_t sourceStartIndex, size_t bitWidth);
+    void SubVector(BitVector* destination, size_t destinationStartIndex, size_t sourceStartIndex, size_t bitWidth) const;
 
     /**
      * Count the number of bits set in a byte.
      */
-    uint32_t CountSetBits(std::byte val);
+    static uint32_t CountSetBits(std::byte val);
 
     /**
      * Calculate the Hamming Distance between two BitVectors.
      */
-    size_t HammingDistance(const BitVector* rhs);
+    size_t HammingDistance(const BitVector* rhs) const;
 
     /**
      * Write a binary representation of this BitVector into a buffer.<br/>
      * The buffer will be null-terminated.<br/>
      * Each character in the resulting buffer will be a '0' or '1'.<br/>
+     * The most-significant bit is written at the beginning of the buffer.</br>
      * Note: bufferLength must be > bitCount.
      * @param buffer Buffer which we will write into.
      * @param bufferLength Length of buffer in bytes.
@@ -153,7 +155,7 @@ public:
      *         binary representation of this BitVector. Otherwise, returns the number
      *         of bytes written to buffer.
      */
-    size_t ToString(char* buffer, size_t bufferLength);
+    size_t ToString(char* buffer, size_t bufferLength) const;
 
     /**
      * Read a BitVector from a null-terminated string of '0' and '1' characters.
@@ -166,13 +168,14 @@ public:
      * Write a hex representation of this BitVector into a buffer.<br/>
      * The buffer will be null-terminated.<br/>
      * Note: bufferLength must be > bitCount / 8 * 2.
+     * @see BitVector::HexFormat
      * @param buffer Buffer which we will write into.
      * @param bufferLength Length of buffer in bytes.
      * @return If buffer is nullptr, returns the number of bytes needed to store the
      *         hex representation of this BitVector. Otherwise, returns the number
      *         of bytes written to buffer.
      */
-    size_t ToHexString(char* buffer, size_t bufferLength);
+    size_t ToStringHex(char* buffer, size_t bufferLength) const;
 
     /**
      * Read a BitVector from a null-terminated string containing a hex
@@ -180,7 +183,7 @@ public:
      * @param buffer String which we will read from.
      * @param bufferLength Length of buffer in bytes.
      */
-    void FromHexString(const char* buffer, size_t bufferLength);
+    void FromStringHex(const char* buffer, size_t bufferLength);
 
 protected:
     void Resize(size_t bitCount);
@@ -202,6 +205,33 @@ protected:
         WriteBytes(bytes, bitIndex, reinterpret_cast<std::byte*>(&value), 0, bitWidth);
         return value;
     }
+
+public:
+    struct HexFormatWrapper {
+        std::ostream& _os;
+    };
+    struct HexFormat_t {
+        friend HexFormatWrapper operator<<(std::ostream& out, const HexFormat_t&);
+    };
+
+    /**
+     * An output manipulator which modifies subsequent stream operations such
+     * that the BitVector will be printed in hex characters instead of binary.
+     * <br/>
+     * BitVector bv;<br/>
+     * cout << BitVector::HexFormat << bv;<br/>
+     * Note: Only the BitVector following BitVector::HexFormat will be formatted
+     * in hex.<br/>
+     * cout << BitVector::HexFormat << bv1 << BitVector::HexFormat << bv2;
+     */
+    static HexFormat_t HexFormat;
+
+    friend std::ostream& operator<<(const HexFormatWrapper& wrapper, const BitVector& bv);
+    friend std::ostream& operator<<(std::ostream& out, const BitVector& bv);
+
+protected:
+    void WriteToStream(std::ostream& out) const;
+    void WriteToStreamHex(std::ostream& out) const;
 };
 
 } // namespace panga
