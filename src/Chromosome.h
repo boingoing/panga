@@ -30,7 +30,7 @@ public:
     Chromosome(const Genome* genome);
     ~Chromosome();
 
-    const Genome* GetGenome();
+    const Genome* GetGenome() const;
 
     /**
      * Randomize all bits in the Chromosome.
@@ -49,7 +49,7 @@ public:
      * geneIndex.
      */
     template <typename IntegerType = uint64_t, bool useGrayEncoding = true>
-    IntegerType DecodeIntegerGene(size_t geneIndex, IntegerType min = 0, IntegerType max = std::numeric_limits<IntegerType>::max()) {
+    IntegerType DecodeIntegerGene(size_t geneIndex, IntegerType min = 0, IntegerType max = std::numeric_limits<IntegerType>::max()) const {
         if (min == max) {
             return min;
         }
@@ -99,7 +99,7 @@ public:
      * geneIndex.
      */
     template <typename FloatType = double, bool useGrayEncoding = true>
-    FloatType DecodeFloatGene(size_t geneIndex, FloatType min, FloatType max) {
+    FloatType DecodeFloatGene(size_t geneIndex, FloatType min, FloatType max) const {
         uint64_t integerValue = this->DecodeIntegerGene<uint64_t, useGrayEncoding>(geneIndex);
         size_t geneWidth = this->_genome->GetGeneBitWitdh(geneIndex);
         return DecodeFloat<FloatType, uint64_t>(integerValue, geneWidth, min, max);
@@ -127,7 +127,7 @@ public:
      * Note: geneIndex must be the index of a boolean gene and not a gene
      * with a bit width - even if that bit width is 1.
      */
-    bool DecodeBooleanGene(size_t geneIndex);
+    bool DecodeBooleanGene(size_t geneIndex) const;
 
     /**
      * Set the bit value at geneIndex.<br/>
@@ -144,7 +144,7 @@ public:
      * @param geneBitWidth An out param which receives the bit width of the
      * gene at geneIndex.
      */
-    std::byte* GetRawGene(size_t geneIndex, size_t* geneBitWidth);
+    std::byte* GetRawGene(size_t geneIndex, size_t* geneBitWidth) const;
 
     /**
      * Decode a binary integer from a gray-encoded value.

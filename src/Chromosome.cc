@@ -19,7 +19,7 @@ Chromosome::Chromosome(const Genome* genome) :
 Chromosome::~Chromosome() {
 }
 
-const Genome* Chromosome::GetGenome() {
+const Genome* Chromosome::GetGenome() const {
     return this->_genome;
 }
 
@@ -29,7 +29,7 @@ void Chromosome::Randomize(RandomWrapper* randomWrapper) {
     }
 }
 
-bool Chromosome::DecodeBooleanGene(size_t geneIndex) {
+bool Chromosome::DecodeBooleanGene(size_t geneIndex) const {
     assert(geneIndex < this->_genome->GetGeneCount());
     assert(geneIndex >= this->_genome->GetFirstBooleanGeneIndex());
 
@@ -49,7 +49,7 @@ void Chromosome::EncodeBooleanGene(size_t geneIndex, bool value) {
     }
 }
 
-std::byte* Chromosome::GetRawGene(size_t geneIndex, size_t* geneBitWidth) {
+std::byte* Chromosome::GetRawGene(size_t geneIndex, size_t* geneBitWidth) const {
     assert(geneIndex < this->_genome->GetFirstBooleanGeneIndex());
     assert(geneBitWidth != nullptr);
 

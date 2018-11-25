@@ -274,7 +274,7 @@ public:
      * populations of each generation.
      */
     void SetGenome(const Genome* genome);
-    const Genome* GetGenome();
+    const Genome* GetGenome() const;
 
     /**
      * When we perform crossover, should we respect gene boundaries such that
@@ -289,7 +289,7 @@ public:
      * In general, this flag should be left at the default of true.
      */
     void SetCrossoverIgnoreGeneBoundaries(bool crossoverIgnoreGeneBoundaries);
-    bool GetCrossoverIgnoreGeneBoundaries();
+    bool GetCrossoverIgnoreGeneBoundaries() const;
 
     /**
      * When we choose parents to use for crossover, should we allow the same
@@ -303,42 +303,42 @@ public:
      * This flag is true by default.
      */
     void SetAllowSameParentCouples(bool allowSameParentCouples);
-    bool GetAllowSameParentCouples();
+    bool GetAllowSameParentCouples() const;
 
     /**
      * Set the number of Individuals we should include in the tournament
      * when using tournament selector.
      */
     void SetTournamentSize(size_t tournamentSize);
-    size_t GetTournamentSize();
+    size_t GetTournamentSize() const;
 
     /**
      * Set the number of points we'll use to cut up the parent chromosomes
      * during k-point crossover.
      */
     void SetKPointCrossoverPointCount(size_t kPointCrossoverPointCount);
-    size_t GetKPointCrossoverPointCount();
+    size_t GetKPointCrossoverPointCount() const;
 
     /**
      * Set the floor value for the population diversity, below which we will
      * more aggressively mutate the population.
      */
     void SetSelfAdaptiveMutationDiversityFloor(double selfAdaptiveMutationDiversityFloor);
-    double GetSelfAdaptiveMutationDiversityFloor();
+    double GetSelfAdaptiveMutationDiversityFloor() const;
 
     /**
      * Set the aggressive mutation rate we will switch to when the population
      * diversity falls below the self-adaptive mutation diversity floor.
      */
     void SetSelfAdaptiveMutationAggressiveRate(double selfAdaptiveMutationAggressiveRate);
-    double GetSelfAdaptiveMutationAggressiveRate();
+    double GetSelfAdaptiveMutationAggressiveRate() const;
 
     /**
      * Set the number of bits we should attempt to mutate with each mutation
      * operation.
      */
     void SetProportionalMutationBitCount(size_t proportionalMutationBitCount);
-    size_t GetProportionalMutationBitCount();
+    size_t GetProportionalMutationBitCount() const;
 
     /**
      * Set the total number of generations we want to evolve.<br/>
@@ -349,7 +349,7 @@ public:
      * rate schedules.
      */
     void SetTotalGenerations(size_t totalGenerations);
-    size_t GetTotalGenerations();
+    size_t GetTotalGenerations() const;
 
     /**
      * Set the mutation rate.<br/>
@@ -362,7 +362,7 @@ public:
      * @see GetCurrentMutationRate
      */
     void SetMutationRate(double mutationRate);
-    double GetMutationRate();
+    double GetMutationRate() const;
 
     /**
      * Set the crossover rate.<br/>
@@ -373,7 +373,7 @@ public:
      * population over into the new one with (1 - crossover rate) chance.
      */
     void SetCrossoverRate(double crossoverRate);
-    double GetCrossoverRate();
+    double GetCrossoverRate() const;
 
     /**
      * Set the crossover type.<br/>
@@ -382,7 +382,7 @@ public:
      * @see CrossoverType
      */
     void SetCrossoverType(CrossoverType crossoverType);
-    CrossoverType GetCrossoverType();
+    CrossoverType GetCrossoverType() const;
 
     /**
      * Set the selector type.<br/>
@@ -391,7 +391,7 @@ public:
      * @see SelectorType
      */
     void SetSelectorType(SelectorType selectorType);
-    SelectorType GetSelectorType();
+    SelectorType GetSelectorType() const;
 
     /**
      * When constructing the next generation, always copy some of the best
@@ -400,7 +400,7 @@ public:
      * @param eliteCount Number of elites.
      */
     void SetEliteCount(size_t eliteCount);
-    size_t GetEliteCount();
+    size_t GetEliteCount() const;
 
     /**
      * Mutated elites are the same as ordinary elite Individuals except they
@@ -409,13 +409,13 @@ public:
      * @see SetMutatedEliteMutationRate
      */
     void SetMutatedEliteCount(size_t mutatedEliteCount);
-    size_t GetMutatedEliteCount();
+    size_t GetMutatedEliteCount() const;
 
     /**
      * Set the rate at mutated elite individuals will be mutated.
      */
     void SetMutatedEliteMutationRate(double mutatedEliteMutationRate);
-    double GetMutatedEliteMutationRate();
+    double GetMutatedEliteMutationRate() const;
 
     /**
      * Set the mutation rate schedule we will use to determine the mutation
@@ -423,7 +423,7 @@ public:
      * @see MutationRateSchedule
      */
     void SetMutationRateSchedule(MutationRateSchedule mutationRateSchedule);
-    MutationRateSchedule GetMutationRateSchedule();
+    MutationRateSchedule GetMutationRateSchedule() const;
 
     /**
      * Set the mutator type.<br/>
@@ -432,14 +432,14 @@ public:
      * @see MutatorType
      */
     void SetMutatorType(MutatorType mutatorType);
-    MutatorType GetMutatorType();
+    MutatorType GetMutatorType() const;
 
     /**
      * Set some data which will be passed into the fitness function called to
      * score each Individual.
      */
     void SetUserData(void* userData);
-    void* GetUserData();
+    void* GetUserData() const;
 
     /**
      * Set the fitness function used to evaluate the fitness of each Individual.
@@ -448,46 +448,46 @@ public:
      * is the user data previously set via GeneticAlgorithm::SetUserData.
      */
     void SetFitnessFunction(FitnessFunction fitnessFunction);
-    FitnessFunction GetFitnessFunction();
+    FitnessFunction GetFitnessFunction() const;
 
     /**
      * Each generation, we will construct and evaluate populationSize
      * Individuals.
      */
     void SetPopulationSize(size_t populationSize);
-    size_t GetPopulationSize();
+    size_t GetPopulationSize() const;
 
     /**
      * Return the current generation.<br/>
      * The generation increases after every step.
      */
-    size_t GetCurrentGeneration();
+    size_t GetCurrentGeneration() const;
 
     /**
      * Return the best Individual from the current population.
      */
-    Individual* GetBestIndividual();
+    Individual* GetBestIndividual() const;
 
     /**
      * Return the Individual at index position from the current population.
      */
-    Individual* GetIndividual(size_t index);
+    Individual* GetIndividual(size_t index) const;
 
     /**
      * Get the minimum score among individuals in the current population.
      */
-    double GetMinimumScore();
+    double GetMinimumScore() const;
 
     /**
      * Get the average score between individuals in the current population.
      */
-    double GetAverageScore();
+    double GetAverageScore() const;
 
     /**
      * Get the standard deviation of scores between individuals in the current
      * population.
      */
-    double GetScoreStandardDeviation();
+    double GetScoreStandardDeviation() const;
 
     /**
      * Get the population diversity among individuals in the current population.
@@ -497,7 +497,7 @@ public:
      * means the individuals have very different genetic components. A value
      * of zero means the individuals are identical.
      */
-    double GetPopulationDiversity();
+    double GetPopulationDiversity() const;
 
     /**
      * Initialize the state of the GeneticAlgorithm.<br/>

@@ -46,7 +46,7 @@ void GeneticAlgorithm::SetGenome(const Genome* genome) {
     this->_genome = genome;
 }
 
-const Genome* GeneticAlgorithm::GetGenome() {
+const Genome* GeneticAlgorithm::GetGenome() const {
     return this->_genome;
 }
 
@@ -54,7 +54,7 @@ void GeneticAlgorithm::SetMutatedEliteMutationRate(double mutatedEliteMutationRa
     this->_mutatedEliteMutationRate = mutatedEliteMutationRate;
 }
 
-double GeneticAlgorithm::GetMutatedEliteMutationRate() {
+double GeneticAlgorithm::GetMutatedEliteMutationRate() const {
     return this->_mutatedEliteMutationRate;
 }
 
@@ -62,7 +62,7 @@ void GeneticAlgorithm::SetMutationRate(double mutationRate) {
     this->_mutationRate = mutationRate;
 }
 
-double GeneticAlgorithm::GetMutationRate() {
+double GeneticAlgorithm::GetMutationRate() const {
     return this->_mutationRate;
 }
 
@@ -70,7 +70,7 @@ void GeneticAlgorithm::SetCrossoverRate(double crossoverRate) {
     this->_crossoverRate = crossoverRate;
 }
 
-double GeneticAlgorithm::GetCrossoverRate() {
+double GeneticAlgorithm::GetCrossoverRate() const {
     return this->_crossoverRate;
 }
 
@@ -78,7 +78,7 @@ void GeneticAlgorithm::SetPopulationSize(size_t populationSize) {
     this->_populationSize = populationSize;
 }
 
-size_t GeneticAlgorithm::GetPopulationSize() {
+size_t GeneticAlgorithm::GetPopulationSize() const {
     return this->_populationSize;
 }
 
@@ -86,7 +86,7 @@ void GeneticAlgorithm::SetTotalGenerations(size_t totalGenerations) {
     this->_totalGenerations = totalGenerations;
 }
 
-size_t GeneticAlgorithm::GetTotalGenerations() {
+size_t GeneticAlgorithm::GetTotalGenerations() const {
     return this->_totalGenerations;
 }
 
@@ -94,11 +94,11 @@ void GeneticAlgorithm::SetFitnessFunction(FitnessFunction fitnessFunction) {
     this->_fitnessFunction = fitnessFunction;
 }
 
-GeneticAlgorithm::FitnessFunction GeneticAlgorithm::GetFitnessFunction() {
+GeneticAlgorithm::FitnessFunction GeneticAlgorithm::GetFitnessFunction() const {
     return this->_fitnessFunction;
 }
 
-size_t GeneticAlgorithm::GetEliteCount() {
+size_t GeneticAlgorithm::GetEliteCount() const {
     return this->_eliteCount;
 }
 
@@ -106,7 +106,7 @@ void GeneticAlgorithm::SetEliteCount(size_t eliteCount) {
     this->_eliteCount = eliteCount;
 }
 
-size_t GeneticAlgorithm::GetMutatedEliteCount() {
+size_t GeneticAlgorithm::GetMutatedEliteCount() const {
     return this->_mutatedEliteCount;
 }
 
@@ -118,7 +118,7 @@ void GeneticAlgorithm::SetMutationRateSchedule(MutationRateSchedule mutationRate
     this->_mutationRateSchedule = mutationRateSchedule;
 }
 
-GeneticAlgorithm::MutationRateSchedule GeneticAlgorithm::GetMutationRateSchedule() {
+GeneticAlgorithm::MutationRateSchedule GeneticAlgorithm::GetMutationRateSchedule() const {
     return this->_mutationRateSchedule;
 }
 
@@ -126,7 +126,7 @@ void GeneticAlgorithm::SetUserData(void* userData) {
     this->_userData = userData;
 }
 
-void* GeneticAlgorithm::GetUserData() {
+void* GeneticAlgorithm::GetUserData() const {
     return this->_userData;
 }
 
@@ -134,7 +134,7 @@ void GeneticAlgorithm::SetCrossoverType(CrossoverType crossoverType) {
     this->_crossoverType = crossoverType;
 }
 
-GeneticAlgorithm::CrossoverType GeneticAlgorithm::GetCrossoverType() {
+GeneticAlgorithm::CrossoverType GeneticAlgorithm::GetCrossoverType() const {
     return this->_crossoverType;
 }
 
@@ -142,7 +142,7 @@ void GeneticAlgorithm::SetMutatorType(MutatorType mutatorType) {
     this->_mutatorType = mutatorType;
 }
 
-GeneticAlgorithm::MutatorType GeneticAlgorithm::GetMutatorType() {
+GeneticAlgorithm::MutatorType GeneticAlgorithm::GetMutatorType() const {
     return this->_mutatorType;
 }
 
@@ -150,7 +150,7 @@ void GeneticAlgorithm::SetSelectorType(SelectorType selectorType) {
     this->_selectorType = selectorType;
 }
 
-GeneticAlgorithm::SelectorType GeneticAlgorithm::GetSelectorType() {
+GeneticAlgorithm::SelectorType GeneticAlgorithm::GetSelectorType() const {
     return this->_selectorType;
 }
 
@@ -158,7 +158,7 @@ void GeneticAlgorithm::SetCrossoverIgnoreGeneBoundaries(bool crossoverIgnoreGene
     this->_crossoverIgnoreGeneBoundaries = crossoverIgnoreGeneBoundaries;
 }
 
-bool GeneticAlgorithm::GetCrossoverIgnoreGeneBoundaries() {
+bool GeneticAlgorithm::GetCrossoverIgnoreGeneBoundaries() const {
     return this->_crossoverIgnoreGeneBoundaries;
 }
 
@@ -166,11 +166,11 @@ void GeneticAlgorithm::SetAllowSameParentCouples(bool allowSameParentCouples) {
     this->_allowSameParentCouples = allowSameParentCouples;
 }
 
-bool GeneticAlgorithm::GetAllowSameParentCouples() {
+bool GeneticAlgorithm::GetAllowSameParentCouples() const {
     return this->_allowSameParentCouples;
 }
 
-size_t GeneticAlgorithm::GetCurrentGeneration() {
+size_t GeneticAlgorithm::GetCurrentGeneration() const {
     return this->_currentGeneration;
 }
 
@@ -178,7 +178,7 @@ void GeneticAlgorithm::SetTournamentSize(size_t tournamentSize) {
     this->_tournamentSize = tournamentSize;
 }
 
-size_t GeneticAlgorithm::GetTournamentSize() {
+size_t GeneticAlgorithm::GetTournamentSize() const {
     return this->_tournamentSize;
 }
 
@@ -186,7 +186,7 @@ void GeneticAlgorithm::SetKPointCrossoverPointCount(size_t kPointCrossoverPointC
     this->_kPointCrossoverPointCount = kPointCrossoverPointCount;
 }
 
-size_t GeneticAlgorithm::GetKPointCrossoverPointCount() {
+size_t GeneticAlgorithm::GetKPointCrossoverPointCount() const {
     return this->_kPointCrossoverPointCount;
 }
 
@@ -194,7 +194,7 @@ void GeneticAlgorithm::SetSelfAdaptiveMutationDiversityFloor(double selfAdaptive
     this->_selfAdaptiveMutationDiversityFloor = selfAdaptiveMutationDiversityFloor;
 }
 
-double GeneticAlgorithm::GetSelfAdaptiveMutationDiversityFloor() {
+double GeneticAlgorithm::GetSelfAdaptiveMutationDiversityFloor() const {
     return this->_selfAdaptiveMutationDiversityFloor;
 }
 
@@ -202,7 +202,7 @@ void GeneticAlgorithm::SetSelfAdaptiveMutationAggressiveRate(double selfAdaptive
     this->_selfAdaptiveMutationAggressiveRate = selfAdaptiveMutationAggressiveRate;
 }
 
-double GeneticAlgorithm::GetSelfAdaptiveMutationAggressiveRate() {
+double GeneticAlgorithm::GetSelfAdaptiveMutationAggressiveRate() const {
     return this->_selfAdaptiveMutationAggressiveRate;
 }
 
@@ -210,11 +210,11 @@ void GeneticAlgorithm::SetProportionalMutationBitCount(size_t proportionalMutati
     this->_proportionalMutationBitCount = proportionalMutationBitCount;
 }
 
-size_t GeneticAlgorithm::GetProportionalMutationBitCount() {
+size_t GeneticAlgorithm::GetProportionalMutationBitCount() const {
     return this->_proportionalMutationBitCount;
 }
 
-Individual* GeneticAlgorithm::GetBestIndividual() {
+Individual* GeneticAlgorithm::GetBestIndividual() const {
     if (this->_lastGenerationPopulation.empty()) {
         return nullptr;
     }
@@ -222,19 +222,19 @@ Individual* GeneticAlgorithm::GetBestIndividual() {
     return this->_lastGenerationPopulation.front();
 }
 
-Individual* GeneticAlgorithm::GetIndividual(size_t index) {
+Individual* GeneticAlgorithm::GetIndividual(size_t index) const {
     assert(index < this->_lastGenerationPopulation.size());
 
     return this->_lastGenerationPopulation[index];
 }
 
-double GeneticAlgorithm::GetMinimumScore() {
+double GeneticAlgorithm::GetMinimumScore() const {
     assert(!this->_lastGenerationPopulation.empty());
 
     return this->_lastGenerationPopulation.front()->GetScore();
 }
 
-double GeneticAlgorithm::GetAverageScore() {
+double GeneticAlgorithm::GetAverageScore() const {
     if (this->_lastGenerationPopulation.empty()) {
         return 0.0;
     }
@@ -246,7 +246,7 @@ double GeneticAlgorithm::GetAverageScore() {
     return sum / this->_lastGenerationPopulation.size();
 }
 
-double GeneticAlgorithm::GetScoreStandardDeviation() {
+double GeneticAlgorithm::GetScoreStandardDeviation() const {
     if (this->_lastGenerationPopulation.size() <= 1) {
         return 0.0;
     }
@@ -260,7 +260,7 @@ double GeneticAlgorithm::GetScoreStandardDeviation() {
     return std::sqrt(sum / (this->_lastGenerationPopulation.size() - 1));
 }
 
-double GeneticAlgorithm::GetPopulationDiversity() {
+double GeneticAlgorithm::GetPopulationDiversity() const {
     assert(this->_lastGenerationPopulation.size() == this->_populationSize);
 
     size_t distance = 0;
