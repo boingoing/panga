@@ -28,7 +28,7 @@ void Population::InitializePartialSums() {
     }
 }
 
-Individual* Population::UniformSelect(RandomWrapper* randomWrapper) {
+Individual* Population::UniformSelect(RandomWrapper* randomWrapper) const {
     assert(this->size() > 0);
 
     size_t index = randomWrapper->RandomInteger<size_t>(0, this->size() - 1);
@@ -36,7 +36,7 @@ Individual* Population::UniformSelect(RandomWrapper* randomWrapper) {
 }
 
 
-Individual* Population::RouletteWheelSelect(RandomWrapper* randomWrapper) {
+Individual* Population::RouletteWheelSelect(RandomWrapper* randomWrapper) const {
     assert(this->size() > 0);
     assert(this->size() == this->_partialSums.size());
 
@@ -59,7 +59,7 @@ Individual* Population::RouletteWheelSelect(RandomWrapper* randomWrapper) {
     return this->at(lower);
 }
 
-Individual* Population::TournamentSelect(size_t tournamentSize, RandomWrapper* randomWrapper) {
+Individual* Population::TournamentSelect(size_t tournamentSize, RandomWrapper* randomWrapper) const {
     Individual* selected = nullptr;
 
     // Choose random individuals from the population to be part of the tournament.
@@ -77,7 +77,7 @@ Individual* Population::TournamentSelect(size_t tournamentSize, RandomWrapper* r
     return selected;
 }
 
-Individual* Population::RankSelect() {
+Individual* Population::RankSelect() const {
     assert(this->size() > 0);
 
     // Population is assumed to be sorted with the best individual in the 0 position.

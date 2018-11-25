@@ -27,10 +27,10 @@ protected:
 public:
     void InitializePartialSums();
 
-    Individual* UniformSelect(RandomWrapper* randomWrapper);
-    Individual* RouletteWheelSelect(RandomWrapper* randomWrapper);
-    Individual* TournamentSelect(size_t tournamentSize, RandomWrapper* randomWrapper);
-    Individual* RankSelect();
+    Individual* UniformSelect(RandomWrapper* randomWrapper) const;
+    Individual* RouletteWheelSelect(RandomWrapper* randomWrapper) const;
+    Individual* TournamentSelect(size_t tournamentSize, RandomWrapper* randomWrapper) const;
+    Individual* RankSelect() const;
 };
 
 } // namespace panga
