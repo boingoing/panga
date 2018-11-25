@@ -8,10 +8,13 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#include <iomanip>
 
 #include "BitVector.h"
 
 using namespace panga;
+
+BitVector::HexFormat_t BitVector::HexFormat;
 
 void BitVector::WriteBytes(std::byte* source, size_t sourceBitStartIndex, std::byte* destination, size_t destinationBitStartIndex, size_t bitWidth) {
     size_t destinationFirstByteIndex = destinationBitStartIndex / 8;
@@ -140,7 +143,7 @@ void BitVector::Unset(size_t index) {
     this->_bytes[byteOffset] &= ~mask;
 }
 
-bool BitVector::Get(size_t index) {
+bool BitVector::Get(size_t index) const {
     assert(index < this->_bitCount);
 
     size_t byteOffset = index / 8;
@@ -150,7 +153,7 @@ bool BitVector::Get(size_t index) {
     return std::to_integer<uint8_t>(value) != 0;
 }
 
-void BitVector::SubVector(BitVector* destination, size_t destinationStartIndex, size_t sourceStartIndex, size_t bitWidth) {
+void BitVector::SubVector(BitVector* destination, size_t destinationStartIndex, size_t sourceStartIndex, size_t bitWidth) const {
     // Resize destination if it's not big enough
     destination->Resize(destinationStartIndex + bitWidth);
 
@@ -168,7 +171,7 @@ uint32_t BitVector::CountSetBits(std::byte val) {
     return c;
 }
 
-size_t BitVector::HammingDistance(const BitVector* rhs) {
+size_t BitVector::HammingDistance(const BitVector* rhs) const {
     size_t distance = 0;
 
     if (this->_bitCount != rhs->_bitCount) {
@@ -192,26 +195,26 @@ size_t BitVector::HammingDistance(const BitVector* rhs) {
     return distance;
 }
 
-bool BitVector::Equals(const BitVector* rhs, size_t bitsToCompare) {
+bool BitVector::Equals(const BitVector* rhs, size_t bitsToCompare) const {
     assert(rhs->_bitCount >= bitsToCompare);
     assert(this->_bitCount >= bitsToCompare);
 
     return Compare(this->_bytes, rhs->_bytes, bitsToCompare);
 }
 
-bool BitVector::Equals(const BitVector* rhs) {
+bool BitVector::Equals(const BitVector* rhs) const {
     return this->Equals(rhs, this->_bitCount);
 }
 
-size_t BitVector::ToString(char* buffer, size_t bufferLength) {
+size_t BitVector::ToString(char* buffer, size_t bufferLength) const {
     if (buffer == nullptr) {
         return this->_bitCount + 1;
     }
 
     assert(bufferLength > this->_bitCount);
 
-    for(size_t i = 0; i < this->_bitCount; i++) {
-        buffer[i] = this->Get(i) ? '1' : '0';
+    for (size_t i = 0; i < this->_bitCount; i++) {
+        buffer[i] = this->Get(this->_bitCount - i - 1) ? '1' : '0';
     }
     buffer[this->_bitCount] = '\0';
 
@@ -226,12 +229,12 @@ void BitVector::FromString(const char* buffer, size_t bufferLength) {
         assert(buffer[i] == '0' || buffer[i] == '1');
 
         if (buffer[i] == '1') {
-            this->Set(i);
+            this->Set(bufferLength - i - 1);
         }
     }
 }
 
-size_t BitVector::ToHexString(char* buffer, size_t bufferLength) {
+size_t BitVector::ToStringHex(char* buffer, size_t bufferLength) const {
     size_t lastByte = this->_bitCount / 8;
     size_t bytesNeeded = (lastByte + 1) * 2;
 
@@ -241,28 +244,66 @@ size_t BitVector::ToHexString(char* buffer, size_t bufferLength) {
 
     assert(bufferLength > bytesNeeded);
 
-    for (size_t i = 0; i < lastByte; i++) {
-        sprintf(buffer + 2 * i, "%02hhx", this->_bytes[i]);
-    }
-
     // Mask the last byte
     size_t relevantBits = this->_bitCount % 8;
     std::byte mask = std::byte{ 0xFF } >> (8 - relevantBits);
 
-    sprintf(buffer + 2 * lastByte, "%02hhx", this->_bytes[lastByte] & mask);
+    sprintf(buffer, "%02hhx", this->_bytes[lastByte] & mask);
+
+    for (size_t i = 0; i < lastByte; i++) {
+        sprintf(buffer + 2 * (i + 1), "%02hhx", this->_bytes[lastByte - i - 1]);
+    }
 
     buffer[bytesNeeded] = '\0';
 
     return bytesNeeded + 1;
 }
 
-void BitVector::FromHexString(const char* buffer, size_t bufferLength) {
+void BitVector::FromStringHex(const char* buffer, size_t bufferLength) {
     assert(buffer != nullptr);
     assert(bufferLength >= 2);
 
     this->SetBitCount(bufferLength / 2 * 8);
 
     for (size_t i = 0; i < this->_bytesCount; i++) {
-        sscanf(buffer + 2 * i, "%02hhx", &this->_bytes[i]);
+        sscanf(buffer + 2 * i, "%02hhx", &this->_bytes[this->_bytesCount - i - 1]);
     }
+}
+
+void BitVector::WriteToStream(std::ostream& out) const {
+    for (size_t i = 0; i < this->_bitCount; i++) {
+        out << (this->Get(this->_bitCount - i - 1) ? '1' : '0');
+    }
+}
+
+void BitVector::WriteToStreamHex(std::ostream& out) const {
+    if (this->_bytesCount == 0) {
+        return;
+    }
+
+    // Mask the last byte
+    size_t lastByte = this->_bitCount / 8;
+    size_t relevantBits = this->_bitCount % 8;
+    std::byte mask = std::byte{ 0xFF } >> (8 - relevantBits);
+
+    out << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(this->_bytes[lastByte] & mask);
+
+    for (size_t i = 0; i < lastByte; i++) {
+        out << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(this->_bytes[lastByte - i - 1]);
+    }
+}
+
+std::ostream& panga::operator<<(std::ostream& out, const BitVector& bv) {
+    bv.WriteToStream(out);
+    return out;
+}
+
+BitVector::HexFormatWrapper panga::operator<<(std::ostream& out, const BitVector::HexFormat_t&) {
+    return {out};
+}
+
+std::ostream& panga::operator<<(const BitVector::HexFormatWrapper& wrapper, const BitVector& bv) {
+    std::ostream& out = wrapper._os;
+    bv.WriteToStreamHex(out);
+    return out;
 }
