@@ -4,6 +4,10 @@
 
 A simple, portable, and efficient genetic algorithm library.
 
+## Why panga
+
+Panga is adapted from the genetic algorithm component of a hobby project named PAN built way back in 2008. For the tenth anniversary of the project, panga was split out into its own library and re-implemented in c++17. Panga is the PAN genetic algorithm (PanGa) component.
+
 ## Building panga
 
 You can build panga on any platform with a compiler which supports c++17 language standards mode. The library is designed to be portable and easy to add to your project. Add the panga source files in `panga/src` to your build definition and you should be ready to use panga.
