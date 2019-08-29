@@ -156,6 +156,13 @@ bool TestBitVectorToString(BitVector* bv, const char* expectedBinString, const c
     sstr2 << *bv;
     AssertTrue(std::strcmp(buf, sstr2.str().c_str()) == 0, "BitVector::ToString produces same result as operator<<");
 
+    BitVector tbv;
+    tbv.FromString(expectedBinString, strlen(expectedBinString));
+    AssertTrue(bv->Equals(&tbv), "BitVector::FromString produces correct BitVector");
+
+    tbv.FromStringHex(expectedHexString, strlen(expectedHexString));
+    AssertTrue(bv->Equals(&tbv), "BitVector::FromStringHex produces correct BitVector");
+
     return true;
 }
 
@@ -173,7 +180,12 @@ bool BitVectorSanityTests() {
     bv.Clear();
     bv.Set(16);
     TestBitVectorToString(&bv, "00010000000000000000", "010000");
-    
+    bv.Clear();
+    bv.SetBitCount(100);
+    bv.SetInt(0xfff, 1, 16);
+    bv.SetInt(0xfff, 81, 16);
+    TestBitVectorToString(&bv, "0000000111111111111000000000000000000000000000000000000000000000000000000000000000000001111111111110", "001ffe00000000000000001ffe");
+
     return true;
 }
 
