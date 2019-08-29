@@ -90,7 +90,13 @@ void BitVector::Clear() {
 }
 
 void BitVector::Resize(size_t bitCount) {
-    size_t newBytesCount = 1 + (bitCount / 8);
+    // Full bytes
+    size_t newBytesCount = bitCount / 8;
+
+    // Partial byte or empty
+    if (bitCount % 8 != 0 || bitCount == 0) {
+        newBytesCount++;
+    }
 
     // Allocate new memory only if we need to grow the vector.
     if (this->_bytesCount < newBytesCount) {
@@ -265,8 +271,10 @@ void BitVector::FromStringHex(const char* buffer, size_t bufferLength) {
 
     this->SetBitCount(bufferLength / 2 * 8);
 
+    char temp_buffer[2];
     for (size_t i = 0; i < this->_bytesCount; i++) {
-        sscanf(buffer + 2 * i, "%02hhx", &this->_bytes[this->_bytesCount - i - 1]);
+        strncpy(temp_buffer, buffer + 2 * i, 2);
+        sscanf(temp_buffer, "%02hhx", &this->_bytes[this->_bytesCount - i - 1]);
     }
 }
 
@@ -289,7 +297,7 @@ void BitVector::WriteToStreamHex(std::ostream& out) const {
     out << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(this->_bytes[lastByte] & mask);
 
     for (size_t i = 0; i < lastByte; i++) {
-        out << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(this->_bytes[lastByte - i - 1]);
+        out << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(this->_bytes[lastByte - i - 1]) << std::dec;
     }
 }
 
