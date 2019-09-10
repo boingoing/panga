@@ -8,6 +8,55 @@ A simple, portable, and efficient genetic algorithm library.
 
 Panga is adapted from the genetic algorithm component of a hobby project named PAN built way back in 2008. For the tenth anniversary of the project, panga was split out into its own library and re-implemented in c++17. Panga is the PAN genetic algorithm (PanGa) component.
 
+## Using panga
+
+Panga offers a simple interface for building and managing genetic algorithms.
+
+```c++
+using namespace panga;
+
+// Return fitness score for Individual - lower is better.
+double TestObjective(Individual* individual, void* userData) {
+    // Cast the user data into a BitVector - this is target.
+    BitVector* bv = static_cast<BitVector*>(userData);
+    
+    // Calculate fitness as count of bits different from target.
+    size_t failBits = br->HammingDistance(individual);
+
+    return (double) failBits;
+}
+
+void Test() {
+    // A bit-pattern we want the genetic algorithm to match.
+    BitVector target;
+    target.FromStringHex("ffffffff", 8);
+
+    // Treat the genome as a bitvector with length equal to the target.
+    Genome genome;
+    genome.AddBooleanGenes(target.GetBitCount());
+
+    GeneticAlgorithm ga;
+    ga.SetGenome(&genome);
+    ga.SetPopulationSize(100);
+    ga.SetTotalGenerations(100);
+    ga.SetFitnessFunction(TestObjective);
+    ga.SetUserData(&target);
+    ga.Initialize();
+    
+    do {
+      ga.Step();
+      
+      // Print current generation stats.
+      std::cout << "Generation " << ga.GetCurrentGeneration()
+                << " => avg: " << ga.GetAverageScore()
+                << " min: " << ga.GetMinimumScore()
+                << " stdev: " << ga.GetScoreStandardDeviation()
+                << " popdiv: " << ga.GetPopulationDiversity()
+                << std::endl;
+    } while (ga.GetMinimumScore() > 0.5);
+}
+```
+
 ## Building panga
 
 You can build panga on any platform with a compiler which supports c++17 language standards mode. The library is designed to be portable and easy to add to your project. Add the panga source files in `panga/src` to your build definition and you should be ready to use panga.
