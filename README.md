@@ -38,7 +38,6 @@ void Test() {
     GeneticAlgorithm ga;
     ga.SetGenome(&genome);
     ga.SetPopulationSize(100);
-    ga.SetTotalGenerations(100);
     ga.SetFitnessFunction(TestObjective);
     ga.SetUserData(&target);
     ga.Initialize();
