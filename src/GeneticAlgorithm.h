@@ -7,8 +7,8 @@
 
 #include <vector>
 
-#include "RandomWrapper.h"
 #include "Population.h"
+#include "RandomWrapper.h"
 
 namespace panga {
 
@@ -229,41 +229,6 @@ public:
     };
 
     typedef double(*FitnessFunction)(Individual*, void*);
-
-protected:
-    const Genome* _genome;
-    Population _population;
-    Population _lastGenerationPopulation;
-    MutationRateSchedule _mutationRateSchedule;
-
-    size_t _populationSize;
-    size_t _totalGenerations;
-    size_t _currentGeneration;
-
-    size_t _eliteCount;
-    size_t _mutatedEliteCount;
-
-    double _mutationRate;
-    double _crossoverRate;
-    double _mutatedEliteMutationRate;
-
-    CrossoverType _crossoverType;
-    MutatorType _mutatorType;
-    SelectorType _selectorType;
-
-    size_t _tournamentSize;
-    size_t _kPointCrossoverPointCount;
-    double _selfAdaptiveMutationDiversityFloor;
-    double _selfAdaptiveMutationAggressiveRate;
-    size_t _proportionalMutationBitCount;
-
-    bool _crossoverIgnoreGeneBoundaries;
-    bool _allowSameParentCouples;
-
-    void* _userData;
-    FitnessFunction _fitnessFunction;
-
-    RandomWrapper _randomWrapper;
 
 public:
     GeneticAlgorithm();
@@ -564,6 +529,41 @@ protected:
     void InitializeSelector(Population* population);
     void SelectParents(Population* population, std::pair<Individual*, Individual*>* parents);
     Individual* SelectOne(Population* population);
+
+private:
+    const Genome* _genome;
+    Population _population;
+    Population _lastGenerationPopulation;
+    MutationRateSchedule _mutationRateSchedule;
+
+    size_t _populationSize;
+    size_t _totalGenerations;
+    size_t _currentGeneration;
+
+    size_t _eliteCount;
+    size_t _mutatedEliteCount;
+
+    double _mutationRate;
+    double _crossoverRate;
+    double _mutatedEliteMutationRate;
+
+    CrossoverType _crossoverType;
+    MutatorType _mutatorType;
+    SelectorType _selectorType;
+
+    size_t _tournamentSize;
+    size_t _kPointCrossoverPointCount;
+    double _selfAdaptiveMutationDiversityFloor;
+    double _selfAdaptiveMutationAggressiveRate;
+    size_t _proportionalMutationBitCount;
+
+    bool _crossoverIgnoreGeneBoundaries;
+    bool _allowSameParentCouples;
+
+    void* _userData;
+    FitnessFunction _fitnessFunction;
+
+    RandomWrapper _randomWrapper;
 };
 
 } // namespace panga

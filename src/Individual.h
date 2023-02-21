@@ -3,7 +3,8 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-#pragma once
+#ifndef INDIVIDUAL_H__
+#define INDIVIDUAL_H__
 
 #include "Chromosome.h"
 
@@ -16,20 +17,12 @@ class Genome;
  * An Individual is a Chromosome with a fitness score.
  */
 class Individual : public Chromosome {
-protected:
-    /**
-     * Proportional fitness score.
-     */
-    double _fitness;
-
-    /**
-     * Raw score received from fitness function.
-     */
-    double _score;
-
 public:
-    Individual(const Genome* genome, const BitVector* chromosome = nullptr);
-    ~Individual();
+    explicit Individual(const Genome& genome);
+    Individual(const Genome& genome, const BitVector& chromosome);
+    Individual(const Individual& rhs) = delete;
+    Individual& operator=(const Individual& rhs) = delete;
+    ~Individual() = default;
 
     /**
      * Less than operator, return negative if this score is less than rhs.score.
@@ -52,8 +45,18 @@ public:
     double GetFitness() const;
     void SetFitness(double fitness);
 
-protected:
-    Individual(const Individual&);
+private:
+    /**
+     * Proportional fitness score.
+     */
+    double fitness_ = 0.0;
+
+    /**
+     * Raw score received from fitness function.
+     */
+    double score_ = 0.0;
 };
 
-} // namespace panga
+}  // namespace panga
+
+#endif  // INDIVIDUAL_H__

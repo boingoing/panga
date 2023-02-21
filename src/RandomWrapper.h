@@ -3,50 +3,42 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-#pragma once
+#ifndef RANDOMWRAPPER_H__
+#define RANDOMWRAPPER_H__
 
-#include <random>
 #include <cstddef>
 #include <cstdint>
-#include <array>
-#include <functional>
+#include <random>
 
 namespace panga {
 
 class RandomWrapper {
-private:
-    std::mt19937 _engine;
-
 public:
-    RandomWrapper() {
-        std::array<int, 624> seed_data;
-        std::random_device r;
-        std::generate_n(seed_data.data(), seed_data.size(), std::ref(r));
-        std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
-        std::mt19937 eng(seq);
-        this->_engine = eng;
-    }
+    RandomWrapper();
+    RandomWrapper(const RandomWrapper& rhs) = delete;
+    RandomWrapper& operator=(const RandomWrapper& rhs) = delete;
+    ~RandomWrapper() = default;
 
     template <typename IntegerType = uint32_t>
     IntegerType RandomInteger(IntegerType min, IntegerType max) {
         std::uniform_int_distribution<IntegerType> dist(min, max);
-        return dist(this->_engine);
+        return dist(engine_);
     }
 
     template <typename FloatType = double>
     FloatType RandomFloat(FloatType min, FloatType max) {
         std::uniform_real_distribution<FloatType> dist(min, max);
-        return dist(this->_engine);
+        return dist(engine_);
     }
 
-    bool CoinFlip(double probability) {
-        std::bernoulli_distribution dist{ probability };
-        return dist(this->_engine);
-    }
+    bool CoinFlip(double probability);
 
-    std::byte RandomByte() {
-        return static_cast<std::byte>(this->_engine());
-    }
+    std::byte RandomByte();
+
+private:
+    std::mt19937 engine_;
 };
 
-} // namespace panga
+}  // namespace panga
+
+#endif  // RANDOMWRAPPER_H__
