@@ -21,8 +21,12 @@ public:
     explicit Individual(const Genome& genome);
     Individual(const Genome& genome, const BitVector& chromosome);
     Individual(const Individual& rhs) = delete;
-    Individual& operator=(const Individual& rhs) = delete;
     ~Individual() = default;
+
+    /**
+     * Copy |rhs| into this Individual.
+     */
+    Individual& operator=(const Individual& rhs);
 
     /**
      * Less than operator, return negative if this score is less than rhs.score.

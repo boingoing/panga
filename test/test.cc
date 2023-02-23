@@ -48,8 +48,8 @@ double TestObjective(Individual* individual, void* userData) {
 }
 
 bool TestSolveMatchingProblem(const char* target) {
-    Genome genome;
     GeneticAlgorithm ga;
+    Genome& genome = ga.GetGenome();
     TestUserData userData;
 
     if (target != nullptr) {
@@ -62,7 +62,6 @@ bool TestSolveMatchingProblem(const char* target) {
     genome.AddBooleanGenes(userData.targetBits.GetBitCount());
     AssertTrue(genome.BitsRequired() == userData.targetBits.GetBitCount(), "Genome encodes correct number of bits");
 
-    ga.SetGenome(&genome);
     ga.SetPopulationSize(100);
     ga.SetTotalGenerations(100);
     ga.SetMutationRate(0.0005);

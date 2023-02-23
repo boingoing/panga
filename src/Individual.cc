@@ -21,6 +21,15 @@ Individual::Individual(const Genome& genome, const BitVector& chromosome) : Chro
     BitVector::operator=(chromosome);
 }
 
+Individual& Individual::operator=(const Individual& rhs) {
+    if (this != &rhs) {
+        score_ = rhs.score_;
+        fitness_ = rhs.fitness_;
+        BitVector::operator=(rhs);
+    }
+    return *this;
+}
+
 bool Individual::operator<(const Individual& rhs) const {
     return score_ < rhs.score_;
 }

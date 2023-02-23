@@ -3,7 +3,8 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-#pragma once
+#ifndef POPULATION_H__
+#define POPULATION_H__
 
 #include <vector>
 
@@ -20,17 +21,24 @@ class RandomWrapper;
  * must be sorted in decreasing fitness order with the Individual at index 0
  * being the most fit.
  */
-class Population : public std::vector<Individual*> {
-protected:
-    std::vector<double> _partialSums;
-
+class Population : public std::vector<Individual> {
 public:
+    Population() = default;
+    Population(const Population& rhs) = default;
+    Population& operator=(const Population& rhs) = default;
+    ~Population() = default;
+
     void InitializePartialSums();
 
-    Individual* UniformSelect(RandomWrapper* randomWrapper) const;
-    Individual* RouletteWheelSelect(RandomWrapper* randomWrapper) const;
-    Individual* TournamentSelect(size_t tournamentSize, RandomWrapper* randomWrapper) const;
-    Individual* RankSelect() const;
+    const Individual& UniformSelect(RandomWrapper* random) const;
+    const Individual& RouletteWheelSelect(RandomWrapper* random) const;
+    const Individual& TournamentSelect(size_t tournament_size, RandomWrapper* random) const;
+    const Individual& RankSelect() const;
+
+private:
+    std::vector<double> partial_sums_;
 };
 
-} // namespace panga
+}  // namespace panga
+
+#endif  // POPULATION_H__

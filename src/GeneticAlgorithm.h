@@ -3,16 +3,17 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-#pragma once
+#ifndef GENETICALGORITHM_H__
+#define GENETICALGORITHM_H__
 
 #include <vector>
 
+#include "Genome.h"
 #include "Population.h"
 #include "RandomWrapper.h"
 
 namespace panga {
 
-class Genome;
 class Individual;
 class BitVector;
 
@@ -57,8 +58,8 @@ public:
          * pieces from both parents alternating.<br/>
          * The points at which the parent chromosomes is cut will be determined
          * randomly.<br/>
-         * k is determined by _kPointCrossoverPointCount.
-         * @see _kPointCrossoverPointCount
+         * k is determined by k_point_crossover_point_count_.
+         * @see k_point_crossover_point_count_
          * @see SetKPointCrossoverPointCount
          * @see GetKPointCrossoverPointCount
          * @see Chromosome::KPointCrossover
@@ -107,7 +108,7 @@ public:
         /**
          * Rank selector.<br/>
          * Always returns the fittest individual from a population.<br/>
-         * When _allowSameParentCouples is false, returns the top two individuals
+         * When allow_same_parent_couples_ is false, returns the top two individuals
          * when we select a couple from a population.
          * @see Population::RankSelect
          */
@@ -144,8 +145,8 @@ public:
          * If n is 1, tournament selector is identical to uniform selector.<br/>
          * If n is the population size, tournament selector is identical to rank
          * selector.<br/>
-         * You can control n with the _tournamentSize property.
-         * @see _tournamentSize
+         * You can control n with the tournament_size_ property.
+         * @see tournament_size_
          * @see SetTournamentSize
          * @see GetTournamentSize
          * @see Population::TournamentSelect
@@ -166,8 +167,8 @@ public:
         /**
          * The mutation rate is constant and does not vary from generation to
          * generation.<br/>
-         * The rate will always be _mutationRate.
-         * @see _mutationRate
+         * The rate will always be mutation_rate_.
+         * @see mutation_rate_
          * @see SetMutationRate
          * @see GetMutationRate
          */
@@ -177,16 +178,16 @@ public:
          * The mutation rate varies by generation.<br/>
          * Early generations introduce a lot of mutation which slowly tapers off
          * to 0 by the last generation. (last generation is controlled by
-         * _totalGenerations)<br/>
-         * Strictly, when the current generation has passed _totalGenerations,
-         * we will set the current mutation rate to _mutationRate instead of
+         * total_generations_)<br/>
+         * Strictly, when the current generation has passed total_generations_,
+         * we will set the current mutation rate to mutation_rate_ instead of
          * 0 because we do not want to stall the evolution.<br/>
-         * The computed mutation rate has nothing to do with _mutationRate unless
-         * we have run-past _totalGenerations.<br/>
+         * The computed mutation rate has nothing to do with mutation_rate_ unless
+         * we have run-past total_generations_.<br/>
          * This mutation schedule does a good job of using the mutation operator
          * to search the solution-space of the chromosome.
-         * @see _totalGenerations
-         * @see _mutationRate
+         * @see total_generations_
+         * @see mutation_rate_
          * @see SetMutationRate
          * @see GetMutationRate
          * @see SetTotalGenerations
@@ -198,20 +199,20 @@ public:
          * Attempt to increase mutation when the population converges too much.
          * Uses the population diversity score as a metric.<br/>
          * When this diveristy falls below a floor value
-         * (_selfAdaptiveMutationDiversityFloor), we will introduce more aggressive
+         * (self_adaptive_mutation_diversity_floor_), we will introduce more aggressive
          * mutation in order to increase diversity and keep the evolution from
          * converging.<br/>
          * The more aggressive mutation rate is configurable via
-         * _selfAdaptiveMutationAggressiveRate.<br/>
+         * self_adaptive_mutation_aggressive_rate_.<br/>
          * When diversity is not below the floor value, we use a constant mutation
-         * rate controlled by _mutationRate.
-         * @see _mutationRate
+         * rate controlled by mutation_rate_.
+         * @see mutation_rate_
          * @see SetMutationRate
          * @see GetMutationRate
-         * @see _selfAdaptiveMutationDiversityFloor
+         * @see self_adaptive_mutation_diversity_floor_
          * @see SetSelfAdaptiveMutationDiversityFloor
          * @see GetSelfAdaptiveMutationDiversityFloor
-         * @see _selfAdaptiveMutationAggressiveRate
+         * @see self_adaptive_mutation_aggressive_rate_
          * @see SetSelfAdaptiveMutationAggressiveRate
          * @see GetSelfAdaptiveMutationAggressiveRate
          */
@@ -220,8 +221,8 @@ public:
         /**
          * Calculates the mutation rate required to flip a number of bits in the
          * chromosome.<br/>
-         * The number of bits is controlled by _proportionalMutationBitCount.
-         * @see _proportionalMutationBitCount
+         * The number of bits is controlled by proportional_mutation_bit_count_.
+         * @see proportional_mutation_bit_count_
          * @see SetProportionalMutationBitCount
          * @see GetProportionalMutationBitCount
          */
@@ -230,16 +231,16 @@ public:
 
     typedef double(*FitnessFunction)(Individual*, void*);
 
-public:
-    GeneticAlgorithm();
-    ~GeneticAlgorithm();
+    GeneticAlgorithm() = default;
+    GeneticAlgorithm(const GeneticAlgorithm& rhs) = delete;
+    GeneticAlgorithm& operator=(const GeneticAlgorithm& rhs) = delete;
+    ~GeneticAlgorithm() = default;
 
     /**
-     * Set the genome we will use to construct Individuals which make up the
-     * populations of each generation.
+     * Get the writable genome we will use to construct Individuals which make up the populations of each generation.
+     * Note: Don't change the genome while the genetic algorithm is running.
      */
-    void SetGenome(const Genome* genome);
-    const Genome* GetGenome() const;
+    Genome& GetGenome();
 
     /**
      * When we perform crossover, should we respect gene boundaries such that
@@ -253,7 +254,7 @@ public:
      * be split according to the crossover operator chosen.<br/>
      * In general, this flag should be left at the default of true.
      */
-    void SetCrossoverIgnoreGeneBoundaries(bool crossoverIgnoreGeneBoundaries);
+    void SetCrossoverIgnoreGeneBoundaries(bool crossover_ignore_gene_boundaries);
     bool GetCrossoverIgnoreGeneBoundaries() const;
 
     /**
@@ -267,42 +268,42 @@ public:
      * couple selected for crossover will be the same Individual.
      * This flag is true by default.
      */
-    void SetAllowSameParentCouples(bool allowSameParentCouples);
+    void SetAllowSameParentCouples(bool allow_same_parent_couples);
     bool GetAllowSameParentCouples() const;
 
     /**
      * Set the number of Individuals we should include in the tournament
      * when using tournament selector.
      */
-    void SetTournamentSize(size_t tournamentSize);
+    void SetTournamentSize(size_t tournament_size);
     size_t GetTournamentSize() const;
 
     /**
      * Set the number of points we'll use to cut up the parent chromosomes
      * during k-point crossover.
      */
-    void SetKPointCrossoverPointCount(size_t kPointCrossoverPointCount);
+    void SetKPointCrossoverPointCount(size_t k_point_crossover_point_count);
     size_t GetKPointCrossoverPointCount() const;
 
     /**
      * Set the floor value for the population diversity, below which we will
      * more aggressively mutate the population.
      */
-    void SetSelfAdaptiveMutationDiversityFloor(double selfAdaptiveMutationDiversityFloor);
+    void SetSelfAdaptiveMutationDiversityFloor(double self_adaptive_mutation_diversity_floor);
     double GetSelfAdaptiveMutationDiversityFloor() const;
 
     /**
      * Set the aggressive mutation rate we will switch to when the population
      * diversity falls below the self-adaptive mutation diversity floor.
      */
-    void SetSelfAdaptiveMutationAggressiveRate(double selfAdaptiveMutationAggressiveRate);
+    void SetSelfAdaptiveMutationAggressiveRate(double self_adaptive_mutation_aggressive_rate);
     double GetSelfAdaptiveMutationAggressiveRate() const;
 
     /**
      * Set the number of bits we should attempt to mutate with each mutation
      * operation.
      */
-    void SetProportionalMutationBitCount(size_t proportionalMutationBitCount);
+    void SetProportionalMutationBitCount(size_t proportional_mutation_bit_count);
     size_t GetProportionalMutationBitCount() const;
 
     /**
@@ -313,7 +314,7 @@ public:
      * This number is used to calculate mutation rate in some mutation
      * rate schedules.
      */
-    void SetTotalGenerations(size_t totalGenerations);
+    void SetTotalGenerations(size_t total_generations);
     size_t GetTotalGenerations() const;
 
     /**
@@ -326,7 +327,7 @@ public:
      * @see MutationRateSchedule
      * @see GetCurrentMutationRate
      */
-    void SetMutationRate(double mutationRate);
+    void SetMutationRate(double mutation_rate);
     double GetMutationRate() const;
 
     /**
@@ -337,7 +338,7 @@ public:
      * Instead of crossover, we will copy one Individual from the old
      * population over into the new one with (1 - crossover rate) chance.
      */
-    void SetCrossoverRate(double crossoverRate);
+    void SetCrossoverRate(double crossover_rate);
     double GetCrossoverRate() const;
 
     /**
@@ -346,7 +347,7 @@ public:
      * produce offspring for the next generation.
      * @see CrossoverType
      */
-    void SetCrossoverType(CrossoverType crossoverType);
+    void SetCrossoverType(CrossoverType crossover_type);
     CrossoverType GetCrossoverType() const;
 
     /**
@@ -355,7 +356,7 @@ public:
      * which to perform crossover to produce offspring for the next generation.
      * @see SelectorType
      */
-    void SetSelectorType(SelectorType selectorType);
+    void SetSelectorType(SelectorType selector_type);
     SelectorType GetSelectorType() const;
 
     /**
@@ -364,7 +365,7 @@ public:
      * are copied as they are and are not crossed-over or mutated.
      * @param eliteCount Number of elites.
      */
-    void SetEliteCount(size_t eliteCount);
+    void SetEliteCount(size_t elite_count);
     size_t GetEliteCount() const;
 
     /**
@@ -373,13 +374,13 @@ public:
      * mutatedEliteMutationRate.
      * @see SetMutatedEliteMutationRate
      */
-    void SetMutatedEliteCount(size_t mutatedEliteCount);
+    void SetMutatedEliteCount(size_t mutated_elite_count);
     size_t GetMutatedEliteCount() const;
 
     /**
      * Set the rate at mutated elite individuals will be mutated.
      */
-    void SetMutatedEliteMutationRate(double mutatedEliteMutationRate);
+    void SetMutatedEliteMutationRate(double mutated_elite_mutation_rate);
     double GetMutatedEliteMutationRate() const;
 
     /**
@@ -387,7 +388,7 @@ public:
      * rate over the course of many generations.
      * @see MutationRateSchedule
      */
-    void SetMutationRateSchedule(MutationRateSchedule mutationRateSchedule);
+    void SetMutationRateSchedule(MutationRateSchedule mutation_rate_schedule);
     MutationRateSchedule GetMutationRateSchedule() const;
 
     /**
@@ -396,14 +397,14 @@ public:
      * to the next generation population.
      * @see MutatorType
      */
-    void SetMutatorType(MutatorType mutatorType);
+    void SetMutatorType(MutatorType mutator_type);
     MutatorType GetMutatorType() const;
 
     /**
      * Set some data which will be passed into the fitness function called to
      * score each Individual.
      */
-    void SetUserData(void* userData);
+    void SetUserData(void* user_data);
     void* GetUserData() const;
 
     /**
@@ -412,14 +413,14 @@ public:
      * The fitness function takes a pointer to an Individual and a void* which
      * is the user data previously set via GeneticAlgorithm::SetUserData.
      */
-    void SetFitnessFunction(FitnessFunction fitnessFunction);
+    void SetFitnessFunction(FitnessFunction fitness_function);
     FitnessFunction GetFitnessFunction() const;
 
     /**
      * Each generation, we will construct and evaluate populationSize
      * Individuals.
      */
-    void SetPopulationSize(size_t populationSize);
+    void SetPopulationSize(size_t population_size);
     size_t GetPopulationSize() const;
 
     /**
@@ -431,12 +432,12 @@ public:
     /**
      * Return the best Individual from the current population.
      */
-    Individual* GetBestIndividual() const;
+    Individual& GetBestIndividual();
 
     /**
      * Return the Individual at index position from the current population.
      */
-    Individual* GetIndividual(size_t index) const;
+    Individual& GetIndividual(size_t index);
 
     /**
      * Get the minimum score among individuals in the current population.
@@ -466,14 +467,16 @@ public:
 
     /**
      * Initialize the state of the GeneticAlgorithm.<br/>
-     * If initialPopulation is passed, use these bits as the chromosomes for
-     * our new population. Otherwise, create a population filled with random
-     * individuals.<br/>
-     * @param initialPopulation We will construct new population members and
-     * interpret these values as binary chromosome data. Pass nullptr to
-     * initialize the population randomly.
+     * Initializes missing population members randomly.
+     * @see SetInitialPopulation
      */
-    void Initialize(const std::vector<const BitVector*>* initialPopulation = nullptr);
+    void Initialize();
+
+    /**
+     * Initialize the GeneticAlgorithm population based on |initial_population|.
+     * @param initial_population We will construct new population members and interpret these values as binary chromosome data.
+     */
+    void SetInitialPopulation(const std::vector<const BitVector*>& initial_population);
 
     /**
      * Perform one step of the genetic algorithm:<br/>
@@ -500,70 +503,55 @@ public:
     void Run();
 
 protected:
-    GeneticAlgorithm(const GeneticAlgorithm&);
-
     /**
-     * Delete each Individual in the population and reset the population
-     * size to 0.
-     */
-    void DeletePopulation(Population* population);
-
-    /**
-     * Score each Individual in the population and then sort the population
-     * in terms of decreasing fitness.
+     * Use the fitness function to score each Individual in the population and then sort the population in terms of decreasing fitness.
      */
     void Evaluate(Population* population);
 
-    /**
-     * Use the fitness function to score one Individual.
-     */
-    void Score(Individual* individual);
-
-    template <bool ignoreGeneBoundaries>
-    void CrossoverInternal(Individual* parent1, Individual* parent2, Individual* offspring);
-
-    void Crossover(Individual* parent1, Individual* parent2, Individual* offspring);
-    void Mutate(Individual* individual, double mutationPercentage);
+    void Crossover(const Individual& parent1, const Individual& parent2, Individual* offspring);
+    void Mutate(Individual* individual, double mutation_percentage);
     double GetCurrentMutationRate();
 
     void InitializeSelector(Population* population);
-    void SelectParents(Population* population, std::pair<Individual*, Individual*>* parents);
-    Individual* SelectOne(Population* population);
+    std::pair<const Individual&, const Individual&> SelectParents(const Population& population);
+    const Individual& SelectOne(const Population& population);
 
 private:
-    const Genome* _genome;
-    Population _population;
-    Population _lastGenerationPopulation;
-    MutationRateSchedule _mutationRateSchedule;
+    Genome genome_;
+    Population population_;
+    Population last_generation_population_;
+    MutationRateSchedule mutation_rate_schedule_ = MutationRateSchedule::Constant;
 
-    size_t _populationSize;
-    size_t _totalGenerations;
-    size_t _currentGeneration;
+    size_t population_size_ = 0;
+    size_t total_generations_ = 0;
+    size_t current_generation_ = 0;
 
-    size_t _eliteCount;
-    size_t _mutatedEliteCount;
+    size_t elite_count_ = 0;
+    size_t mutated_elite_count_ = 0;
 
-    double _mutationRate;
-    double _crossoverRate;
-    double _mutatedEliteMutationRate;
+    double mutation_rate_ = 0.0005;
+    double crossover_rate_ = 0.9;
+    double mutated_elite_mutation_rate_ = 0.0;
 
-    CrossoverType _crossoverType;
-    MutatorType _mutatorType;
-    SelectorType _selectorType;
+    CrossoverType crossover_type_ = CrossoverType::Uniform;
+    MutatorType mutator_type_ = MutatorType::Flip;
+    SelectorType selector_type_ = SelectorType::Tournament;
 
-    size_t _tournamentSize;
-    size_t _kPointCrossoverPointCount;
-    double _selfAdaptiveMutationDiversityFloor;
-    double _selfAdaptiveMutationAggressiveRate;
-    size_t _proportionalMutationBitCount;
+    size_t tournament_size_ = 2;
+    size_t k_point_crossover_point_count_ = 3;
+    double self_adaptive_mutation_diversity_floor_ = 0.0002;
+    double self_adaptive_mutation_aggressive_rate_ = 0.1;
+    size_t proportional_mutation_bit_count_ = 1;
 
-    bool _crossoverIgnoreGeneBoundaries;
-    bool _allowSameParentCouples;
+    bool crossover_ignore_gene_boundaries_ = true;
+    bool allow_same_parent_couples_ = true;
 
-    void* _userData;
-    FitnessFunction _fitnessFunction;
+    void* user_data_ = nullptr;
+    FitnessFunction fitness_function_ = nullptr;
 
-    RandomWrapper _randomWrapper;
+    RandomWrapper random_;
 };
 
-} // namespace panga
+}  // namespace panga
+
+#endif  // GENETICALGORITHM_H__
