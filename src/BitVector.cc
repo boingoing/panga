@@ -270,13 +270,14 @@ size_t BitVector::ToStringHex(char* buffer, size_t buffer_length) const {
         const std::byte mask = ByteAllSet >> (BitsPerByte - relevant_bits);
         int bytes_written = 0;
 
-        bytes_written += snprintf(buffer, 2, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte] & mask));
+        // snprintf writes 3 bytes into |buffer| but the last one is the null terminator which we will overwrite in the next iteration so we'll ignore it in the bytes_written counter.
+        bytes_written += snprintf(buffer, 3U, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte] & mask)) - 1;
         for (size_t i = 0; i < last_byte; i++) {
-            bytes_written += snprintf(buffer + 2U * (i + 1U), 2, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte - i - 1U]));
+            bytes_written += snprintf(buffer + 2U * (i + 1U), 3U, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte - i - 1U])) - 1;
         }
 
-        assert(bytes_written == bytes_needed - 1U);
-        buffer[bytes_needed] = '\0';
+        assert(bytes_written + 1U == bytes_needed);
+        assert(buffer[bytes_needed] == '\0');
     }
 
     return bytes_needed + 1U;

@@ -29,11 +29,17 @@ void Population::InitializePartialSums() {
 }
 
 void Population::Sort() {
-    sorted_indices_.resize(size());
-
-    for (size_t index = 0; index < size(); index++) {
-        
+    // Only initialize the set of sorted indices once or when the size of the population has changed.
+    if (sorted_indices_.empty() || sorted_indices_.size() != size()) {
+        sorted_indices_.resize(size());
+        for (size_t index = 0; index < size(); index++) {
+            sorted_indices_[index] = index;
+        }
     }
+
+    assert(sorted_indices_.size() == size());
+
+    std::sort(sorted_indices_.begin(), sorted_indices_.end(), [=](const size_t& left, const size_t& right) { return this->at(left) < this->at(right); });
 }
 
 const Individual& Population::GetBestIndividual() const {
