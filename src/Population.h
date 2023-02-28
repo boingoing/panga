@@ -29,6 +29,9 @@ public:
     ~Population() = default;
 
     void InitializePartialSums();
+    void Sort();
+
+    const Individual& GetBestIndividual() const;
 
     const Individual& UniformSelect(RandomWrapper* random) const;
     const Individual& RouletteWheelSelect(RandomWrapper* random) const;
@@ -37,6 +40,7 @@ public:
 
 private:
     std::vector<double> partial_sums_;
+    std::vector<size_t> sorted_indices_;
 };
 
 }  // namespace panga

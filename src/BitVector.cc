@@ -93,7 +93,7 @@ void BitVector::WriteBytes(const std::byte* source, size_t source_start_bit_offs
     }
 
     // Now mask off the last byte so we don't lose existing bits there.
-    size_t destination_last_byte_bit_index = (destination_start_bit_offset + bits_to_copy) % BitsPerByte;
+    const size_t destination_last_byte_bit_index = (destination_start_bit_offset + bits_to_copy) % BitsPerByte;
     const std::byte mask = ByteAllSet << destination_last_byte_bit_index;
     destination[destination_last_byte_index] = destination[destination_last_byte_index] & ~mask | last_byte & mask;
 }
@@ -268,12 +268,14 @@ size_t BitVector::ToStringHex(char* buffer, size_t buffer_length) const {
         // Mask the last byte.
         const size_t relevant_bits = this->bit_count_ % BitsPerByte;
         const std::byte mask = ByteAllSet >> (BitsPerByte - relevant_bits);
+        int bytes_written = 0;
 
-        sprintf(buffer, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte] & mask));
+        bytes_written += snprintf(buffer, 2, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte] & mask));
         for (size_t i = 0; i < last_byte; i++) {
-            sprintf(buffer + 2U * (i + 1U), "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte - i - 1U]));
+            bytes_written += snprintf(buffer + 2U * (i + 1U), 2, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte - i - 1U]));
         }
 
+        assert(bytes_written == bytes_needed - 1U);
         buffer[bytes_needed] = '\0';
     }
 

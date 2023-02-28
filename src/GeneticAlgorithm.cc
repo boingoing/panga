@@ -180,22 +180,17 @@ size_t GeneticAlgorithm::GetProportionalMutationBitCount() const {
     return proportional_mutation_bit_count_;
 }
 
-Individual& GeneticAlgorithm::GetBestIndividual() {
-    assert(!last_generation_population_.empty());
-    return last_generation_population_.front();
+const Individual& GeneticAlgorithm::GetBestIndividual() const {
+    return last_generation_population_.GetBestIndividual();
 }
 
-Individual& GeneticAlgorithm::GetIndividual(size_t index) {
+const Individual& GeneticAlgorithm::GetIndividual(size_t index) const {
     assert(index < last_generation_population_.size());
     return last_generation_population_[index];
 }
 
 double GeneticAlgorithm::GetMinimumScore() const {
-    if (last_generation_population_.empty()) {
-        return 0.0;
-    }
-
-    return last_generation_population_.front().GetScore();
+    return GetBestIndividual().GetScore();
 }
 
 double GeneticAlgorithm::GetAverageScore() const {

@@ -10,7 +10,7 @@
 namespace panga {
 
 void Population::InitializePartialSums() {
-    assert(this->size() > 0);
+    assert(size() > 0);
 
     this->partial_sums_.resize(this->size());
 
@@ -26,6 +26,18 @@ void Population::InitializePartialSums() {
     for (size_t i = 0; i < this->size(); i++) {
         this->partial_sums_[i] /= this->partial_sums_[this->size() - 1];
     }
+}
+
+void Population::Sort() {
+    sorted_indices_.resize(size());
+
+    for (size_t index = 0; index < size(); index++) {
+        
+    }
+}
+
+const Individual& Population::GetBestIndividual() const {
+
 }
 
 const Individual& Population::UniformSelect(RandomWrapper* random) const {

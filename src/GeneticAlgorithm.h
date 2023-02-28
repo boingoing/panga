@@ -432,12 +432,12 @@ public:
     /**
      * Return the best Individual from the current population.
      */
-    Individual& GetBestIndividual();
+    const Individual& GetBestIndividual() const;
 
     /**
      * Return the Individual at index position from the current population.
      */
-    Individual& GetIndividual(size_t index);
+    const Individual& GetIndividual(size_t index) const;
 
     /**
      * Get the minimum score among individuals in the current population.
