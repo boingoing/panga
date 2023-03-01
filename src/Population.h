@@ -31,6 +31,9 @@ public:
     void InitializePartialSums();
     void Sort();
 
+    /**
+     * Return the best Individual from the population.
+     */
     const Individual& GetBestIndividual() const;
 
     const Individual& UniformSelect(RandomWrapper* random) const;

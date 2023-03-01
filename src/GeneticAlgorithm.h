@@ -378,7 +378,7 @@ public:
     size_t GetMutatedEliteCount() const;
 
     /**
-     * Set the rate at mutated elite individuals will be mutated.
+     * Set the rate at which mutated elite individuals will be mutated.
      */
     void SetMutatedEliteMutationRate(double mutated_elite_mutation_rate);
     double GetMutatedEliteMutationRate() const;
@@ -417,8 +417,7 @@ public:
     FitnessFunction GetFitnessFunction() const;
 
     /**
-     * Each generation, we will construct and evaluate populationSize
-     * Individuals.
+     * Each generation, we will construct and evaluate |population_size| Individuals.
      */
     void SetPopulationSize(size_t population_size);
     size_t GetPopulationSize() const;

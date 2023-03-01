@@ -16,10 +16,10 @@ void Population::InitializePartialSums() {
 
     // Assume population is sorted, and fitness values are calculated.
     // First Individual should have the highest fitness score.
-    this->partial_sums_[0] = this->at(0)->GetFitness();
+    this->partial_sums_[0] = this->at(0).GetFitness();
 
     for (size_t i = 1; i < this->size(); i++) {
-        this->partial_sums_[i] = this->at(i)->GetFitness() + this->partial_sums_[i - 1];
+        this->partial_sums_[i] = this->at(i).GetFitness() + this->partial_sums_[i - 1];
     }
 
     // Scale from (0,1)
@@ -38,12 +38,15 @@ void Population::Sort() {
     }
 
     assert(sorted_indices_.size() == size());
-
     std::sort(sorted_indices_.begin(), sorted_indices_.end(), [=](const size_t& left, const size_t& right) { return this->at(left) < this->at(right); });
 }
 
 const Individual& Population::GetBestIndividual() const {
+    assert(!sorted_indices_.empty());
+    assert(!empty());
 
+    const auto index = sorted_indices_[0];
+    return this->at(index);
 }
 
 const Individual& Population::UniformSelect(RandomWrapper* random) const {
