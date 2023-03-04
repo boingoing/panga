@@ -39,6 +39,8 @@ void Population::Sort() {
 
     assert(sorted_indices_.size() == size());
     std::sort(sorted_indices_.begin(), sorted_indices_.end(), [=](const size_t& left, const size_t& right) { return this->at(left) < this->at(right); });
+
+    is_sorted_ = true;
 }
 
 const Individual& Population::GetBestIndividual() const {
@@ -50,6 +52,7 @@ const Individual& Population::GetIndividual(size_t index) const {
     assert(!sorted_indices_.empty());
     assert(!empty());
     assert(index < sorted_indices_.size());
+    assert(is_sorted_);
 
     const auto sorted_index = sorted_indices_[index];
     return this->at(sorted_index);
@@ -60,10 +63,7 @@ double Population::GetMinimumScore() const {
 }
 
 double Population::GetAverageScore() const {
-    // TODO(boingoing): Evaluate if this really should be an error. We can't divide by zero below...
-    if (empty()) {
-        return 0.0;
-    }
+    assert(!empty());
 
     double sum = 0.0;
     for (const auto& i : *this) {
@@ -142,8 +142,7 @@ const Individual& Population::RouletteWheelSelect(RandomWrapper* random) const {
 const Individual& Population::TournamentSelect(size_t tournament_size, RandomWrapper* random) const {
     assert(tournament_size > 0);
 
-    // Pick a first individual randomly.
-    const auto& best = UniformSelect(random);
+    const Individual* selected = nullptr;
 
     // Choose random individuals from the population to be part of the tournament.
     for (size_t i = 0; i < tournament_size; i++) {
@@ -152,12 +151,13 @@ const Individual& Population::TournamentSelect(size_t tournament_size, RandomWra
         // If this is the first individual we've picked, it will be the winner for now.
         // Otherwise, choose the most fit between the previous winner and the new 
         // member of the tournament.
-        if (selected == nullptr || temp->GetFitness() > selected->GetFitness()) {
-            selected = temp;
+        if (selected == nullptr || temp.GetFitness() > selected->GetFitness()) {
+            selected = &temp;
         }
     }
 
-    return best;
+    assert(selected != nullptr);
+    return *selected;
 }
 
 const Individual& Population::RankSelect() const {

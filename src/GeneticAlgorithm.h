@@ -429,40 +429,9 @@ public:
     size_t GetCurrentGeneration() const;
 
     /**
-     * Return the best Individual from the current population.
+     * Get the current genetic algorithm population.
      */
-    const Individual& GetBestIndividual() const;
-
-    /**
-     * Return the Individual at index position from the current population.
-     */
-    const Individual& GetIndividual(size_t index) const;
-
-    /**
-     * Get the minimum score among individuals in the current population.
-     */
-    double GetMinimumScore() const;
-
-    /**
-     * Get the average score between individuals in the current population.
-     */
-    double GetAverageScore() const;
-
-    /**
-     * Get the standard deviation of scores between individuals in the current
-     * population.
-     */
-    double GetScoreStandardDeviation() const;
-
-    /**
-     * Get the population diversity among individuals in the current population.
-     * <br/>
-     * The population diversity is a metric used to indicate how much the
-     * genetic material backing the individuals varies. A high diversity value
-     * means the individuals have very different genetic components. A value
-     * of zero means the individuals are identical.
-     */
-    double GetPopulationDiversity() const;
+    const Population& GetPopulation() const;
 
     /**
      * Initialize the state of the GeneticAlgorithm.<br/>

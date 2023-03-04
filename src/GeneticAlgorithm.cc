@@ -180,61 +180,8 @@ size_t GeneticAlgorithm::GetProportionalMutationBitCount() const {
     return proportional_mutation_bit_count_;
 }
 
-const Individual& GeneticAlgorithm::GetBestIndividual() const {
-    return last_generation_population_.GetBestIndividual();
-}
-
-const Individual& GeneticAlgorithm::GetIndividual(size_t index) const {
-    assert(index < last_generation_population_.size());
-    return last_generation_population_[index];
-}
-
-double GeneticAlgorithm::GetMinimumScore() const {
-    return GetBestIndividual().GetScore();
-}
-
-double GeneticAlgorithm::GetAverageScore() const {
-    if (last_generation_population_.empty()) {
-        return 0.0;
-    }
-
-    double sum = 0.0;
-    for (const auto& i : last_generation_population_) {
-        sum += i.GetScore();
-    }
-    return sum / last_generation_population_.size();
-}
-
-double GeneticAlgorithm::GetScoreStandardDeviation() const {
-    if (last_generation_population_.size() <= 1U) {
-        return 0.0;
-    }
-
-    const double mean = GetAverageScore();
-    double sum = 0.0;
-    for (const auto& i : last_generation_population_) {
-        const double score = i.GetScore();
-        sum += (score - mean) * (score - mean);
-    }
-    return std::sqrt(sum / (last_generation_population_.size() - 1U));
-}
-
-double GeneticAlgorithm::GetPopulationDiversity() const {
-    assert(last_generation_population_.size() == population_size_);
-
-    size_t distance = 0;
-    size_t j = 0;
-    // Compute the total number of differing bits between each individual and every other in the population.
-    for (const auto& i : last_generation_population_) {
-        // Compare the individual only against members at further indices in the population. This way we don't double count each comparison.
-        for (auto it = last_generation_population_.cbegin() + ++j; it != last_generation_population_.cend(); it++) {
-            distance += i.HammingDistance(*it);
-        }
-    }
-
-    const size_t total_compares = (population_size_ * (population_size_ - 1U)) >> 2U;
-    const size_t total_bits = total_compares * genome_.BitsRequired();
-    return static_cast<double>(distance) / total_bits;
+const Population& GeneticAlgorithm::GetPopulation() const {
+    return last_generation_population_;
 }
 
 void GeneticAlgorithm::SetInitialPopulation(const std::vector<const BitVector*>& initial_population) {

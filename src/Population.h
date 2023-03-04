@@ -28,10 +28,15 @@ public:
     Population& operator=(const Population& rhs) = default;
     ~Population() = default;
 
+    /**
+     * Initialize the set of partial sums we use for the roulette wheel selector.<br/>
+     * Note: Requires the population to have been sorted.
+     */
     void InitializePartialSums();
 
     /**
-     * Sort the individuals in the population by decreasing fitness - ie: the best individual will be stored at index 0, the second best at index 1, etc.
+     * Sort the individuals in the population by decreasing fitness - ie: the best individual will be stored at index 0, the second best at index 1, etc.<br/>
+     * This must be called before using the selection functions as they rely on the population being sorted.
      */
     void Sort();
 
@@ -75,7 +80,15 @@ public:
      * Select an individual from the population at random.
      */
     const Individual& UniformSelect(RandomWrapper* random) const;
+
+    /**
+     * Spin a roulette wheel to select an individual where each slice on the wheel corresponds to the partial sum of a ranked individual. The size of each partial sum on the wheel is relative to the fitness of that individual with more fit individuals having a larger-sized slice.
+     */
     const Individual& RouletteWheelSelect(RandomWrapper* random) const;
+
+    /**
+     * Randomly select |tournament_size| individuals from the population and return the one with highest fitness.
+     */
     const Individual& TournamentSelect(size_t tournament_size, RandomWrapper* random) const;
 
     /**
@@ -86,6 +99,7 @@ public:
 private:
     std::vector<double> partial_sums_;
     std::vector<size_t> sorted_indices_;
+    bool is_sorted_ = false;
 };
 
 }  // namespace panga
