@@ -29,16 +29,58 @@ public:
     ~Population() = default;
 
     void InitializePartialSums();
+
+    /**
+     * Sort the individuals in the population by decreasing fitness - ie: the best individual will be stored at index 0, the second best at index 1, etc.
+     */
     void Sort();
 
     /**
-     * Return the best Individual from the population.
+     * Return the Individual with highest fitness value in the population.<br/>
+     * Note: Requires the population to have been sorted.
      */
     const Individual& GetBestIndividual() const;
 
+    /**
+     * Return the Individual at |index| position in the population.<br/>
+     * Note: Requires the population to have been sorted.
+     */
+    const Individual& GetIndividual(size_t index) const;
+
+    /**
+     * Get the minimum score among individuals in the population.
+     */
+    double GetMinimumScore() const;
+
+    /**
+     * Get the average score between individuals in the population.
+     */
+    double GetAverageScore() const;
+
+    /**
+     * Get the standard deviation of scores between individuals in the population.
+     */
+    double GetScoreStandardDeviation() const;
+
+    /**
+     * Get the population diversity among individuals in the population.<br/>
+     * The population diversity is a metric used to indicate how much the
+     * genetic material backing the individuals varies. A high diversity value
+     * means the individuals have very different genetic components. A value
+     * of zero means the individuals are identical.
+     */
+    double GetPopulationDiversity() const;
+
+    /**
+     * Select an individual from the population at random.
+     */
     const Individual& UniformSelect(RandomWrapper* random) const;
     const Individual& RouletteWheelSelect(RandomWrapper* random) const;
     const Individual& TournamentSelect(size_t tournament_size, RandomWrapper* random) const;
+
+    /**
+     * Select the individual in the population with highest fitness score.
+     */
     const Individual& RankSelect() const;
 
 private:

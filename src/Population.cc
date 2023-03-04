@@ -10,21 +10,21 @@
 namespace panga {
 
 void Population::InitializePartialSums() {
-    assert(size() > 0);
+    assert(!empty());
 
-    this->partial_sums_.resize(this->size());
+    partial_sums_.resize(size());
 
     // Assume population is sorted, and fitness values are calculated.
     // First Individual should have the highest fitness score.
-    this->partial_sums_[0] = this->at(0).GetFitness();
-
+    partial_sums_[0] = GetIndividual(0).GetFitness();
     for (size_t i = 1; i < this->size(); i++) {
-        this->partial_sums_[i] = this->at(i).GetFitness() + this->partial_sums_[i - 1];
+        partial_sums_[i] = GetIndividual(i).GetFitness() + partial_sums_[i - 1];
     }
 
     // Scale from (0,1)
-    for (size_t i = 0; i < this->size(); i++) {
-        this->partial_sums_[i] /= this->partial_sums_[this->size() - 1];
+    const auto& max_value = partial_sums_[size() - 1U];
+    for (auto& i : partial_sums_) {
+        i /= max_value;
     }
 }
 
@@ -42,49 +42,112 @@ void Population::Sort() {
 }
 
 const Individual& Population::GetBestIndividual() const {
+    // Assume we are sorted and best individual is stored at 0th index.
+    return GetIndividual(0);
+}
+
+const Individual& Population::GetIndividual(size_t index) const {
     assert(!sorted_indices_.empty());
     assert(!empty());
+    assert(index < sorted_indices_.size());
 
-    const auto index = sorted_indices_[0];
-    return this->at(index);
+    const auto sorted_index = sorted_indices_[index];
+    return this->at(sorted_index);
+}
+
+double Population::GetMinimumScore() const {
+    return GetBestIndividual().GetScore();
+}
+
+double Population::GetAverageScore() const {
+    // TODO(boingoing): Evaluate if this really should be an error. We can't divide by zero below...
+    if (empty()) {
+        return 0.0;
+    }
+
+    double sum = 0.0;
+    for (const auto& i : *this) {
+        sum += i.GetScore();
+    }
+    return sum / size();
+}
+
+double Population::GetScoreStandardDeviation() const {
+    // stdev of a single score is 0.
+    if (size() <= 1U) {
+        return 0.0;
+    }
+
+    const double mean = GetAverageScore();
+    double sum = 0.0;
+    for (const auto& i : *this) {
+        const double score = i.GetScore();
+        sum += (score - mean) * (score - mean);
+    }
+    return std::sqrt(sum / (size() - 1U));
+}
+
+double Population::GetPopulationDiversity() const {
+    // Diversity of a single individual would be zero.
+    if (size() <= 1U) {
+        return 0.0;
+    }
+
+    size_t distance = 0;
+    size_t j = 0;
+
+    // Compute the total number of differing bits between each individual and every other in the population.
+    for (const auto& i : *this) {
+        // Compare the individual only against members at further indices in the population. This way we don't double count each comparison.
+        for (auto it = cbegin() + ++j; it != cend(); it++) {
+            distance += i.HammingDistance(*it);
+        }
+    }
+
+    const size_t genome_bits = at(0).GetGenome().BitsRequired();
+    const size_t total_compares = (size() * (size() - 1U)) >> 2U;
+    const size_t total_bits = total_compares * genome_bits;
+    return static_cast<double>(distance) / total_bits;
 }
 
 const Individual& Population::UniformSelect(RandomWrapper* random) const {
-    assert(size() > 0);
+    assert(!empty());
 
     size_t index = random->RandomInteger<size_t>(0, size() - 1U);
     return at(index);
 }
 
-Individual* Population::RouletteWheelSelect(RandomWrapper* random) const {
-    assert(this->size() > 0);
-    assert(this->size() == this->partial_sums_.size());
+const Individual& Population::RouletteWheelSelect(RandomWrapper* random) const {
+    assert(!empty());
+    assert(size() == partial_sums_.size());
 
-    double cutoff = random->RandomFloat<double>(0.0, 1.0);
-    int lower = 0;
-    int upper = (int)this->size() - 1;
+    const double cutoff = random->RandomFloat<double>(0.0, 1.0);
+    size_t lower = 0;
+    size_t upper = size() - 1U;
 
     // Perform binary search across partial sums.
     while (upper >= lower) {
-        int i = lower + (upper - lower) / 2;
-
-        if (this->partial_sums_[i] > cutoff) {
+        const auto i = lower + (upper - lower) / 2U;
+        if (partial_sums_[i] > cutoff) {
             upper = i - 1;
         } else {
             lower = i + 1;
         }
     }
 
-    lower = std::min((int)this->size() - 1, lower);
-    return this->at(lower);
+    lower = std::min(size() - 1U, lower);
+    return GetIndividual(lower);
 }
 
-Individual* Population::TournamentSelect(size_t tournament_size, RandomWrapper* random) const {
-    Individual* selected = nullptr;
+const Individual& Population::TournamentSelect(size_t tournament_size, RandomWrapper* random) const {
+    assert(tournament_size > 0);
+
+    // Pick a first individual randomly.
+    const auto& best = UniformSelect(random);
 
     // Choose random individuals from the population to be part of the tournament.
     for (size_t i = 0; i < tournament_size; i++) {
-        Individual* temp = this->UniformSelect(random);
+        const auto& temp = UniformSelect(random);
 
         // If this is the first individual we've picked, it will be the winner for now.
         // Otherwise, choose the most fit between the previous winner and the new 
@@ -94,14 +157,11 @@ Individual* Population::TournamentSelect(size_t tournament_size, RandomWrapper* 
         }
     }
 
-    return selected;
+    return best;
 }
 
-Individual* Population::RankSelect() const {
-    assert(this->size() > 0);
-
-    // Population is assumed to be sorted with the best individual in the 0 position.
-    return this->at(0);
+const Individual& Population::RankSelect() const {
+    return GetBestIndividual();
 }
 
 }  // namespace panga
