@@ -12,6 +12,11 @@
 
 namespace panga {
 
+GeneticAlgorithm::GeneticAlgorithm() : population_(genome_), last_generation_population_(genome_) {
+    populations_.emplace_back(genome_);
+    populations_.emplace_back(genome_);
+}
+
 Genome& GeneticAlgorithm::GetGenome() {
     return genome_;
 }
@@ -184,82 +189,89 @@ const Population& GeneticAlgorithm::GetPopulation() const {
     return last_generation_population_;
 }
 
-void GeneticAlgorithm::SetInitialPopulation(const std::vector<const BitVector*>& initial_population) {
-    // We can only set the initial population if there are no members already in it.
-    assert(population_.empty());
-
-    // Create new population members based on the initial_population.
-    for (const auto* const bv : initial_population) {
-            if (population_.size() < population_size_) {
-                population_.emplace_back(genome_, *bv);
-            }
-    }
+void GeneticAlgorithm::SetInitialPopulation(const std::vector<const BitVector>& initial_population) {
+    auto& population = GetCurrentPopulation();
+    population.Initialize(initial_population);
 }
 
 void GeneticAlgorithm::Initialize() {
-    // If the population isn't full, fill it up with random individuals.
-    while (population_.size() < population_size_) {
-        auto& individual = population_.emplace_back(genome_);
-        individual.Randomize(&random_);
-    }
+    // If the population isn't full, this will fill it up with random individuals.
+    auto& population = GetCurrentPopulation();
+    population.Resize(population_size_, &random_);
 
     // Reset the current generation.
     current_generation_ = 0;
 }
 
+Population& GeneticAlgorithm::GetCurrentPopulation() {
+    // Even generations should use the 0th population as current.
+    // Odd generations should use the 1st population as current.
+    const size_t current_population_index = current_generation_ % 2U;
+    return populations_[current_population_index];
+}
+
+Population& GeneticAlgorithm::GetLastGenerationPopulation() {
+    // Even generations should use the 1st population as previous.
+    // Odd generations should use the 0th population as previous.
+    const size_t previous_population_index = (current_generation_ + 1U) % 2U;
+    return populations_[previous_population_index];
+}
+
 void GeneticAlgorithm::Step() {
-    // We are about to score the current population.
-    current_generation_++;
+    auto& current_population = GetCurrentPopulation();
+
+    // If we're on any generation other than the 0th one, we need to build the current population based on the previous generation.
+    if (current_generation_ != 0) {
+        const auto& last_generation_population = GetLastGenerationPopulation();
+        // Elitism
+        // Add the best individuals from last generation into the current population.
+        // Note: last_generation_population_ must already be sorted with best individuals at the front.
+        for (size_t i = 0; i < elite_count_; i++) {
+            // Overwrite the first i members of population with those from last generation.
+            population_[i] = last_generation_population_[i];
+        }
+
+        // Mutated elitism
+        // Take the best individuals from the last generation but mutate them by a variable rate.
+        for (size_t i = 0; i < mutated_elite_count_; i++) {
+            auto& mutated_elite = population_[elite_count_ + i];
+            mutated_elite = last_generation_population_[i];
+            Mutate(&mutated_elite, mutated_elite_mutation_rate_);
+        }
+
+        // Get the mutation rate for the current generation.
+        // Note: This can depend on the population already having been evaluated.
+        const double current_mutation_rate = GetCurrentMutationRate();
+        // Initialize the selector.
+        InitializeSelector(&last_generation_population_);
+
+        // We already added elite_count_ + mutated_elite_count_ individuals based on the last generation.
+        size_t current_population_size = elite_count_ + mutated_elite_count_;
+        // Create offspring from individuals in last generation.
+        while (current_population_size < population_size_) {
+            auto& offspring = population_[current_population_size++];
+
+            // Select a couple from the last generation.
+            const auto parents = SelectParents(last_generation_population_);
+
+            // See if we will do crossover or duplicate a parent.
+            if (random_.CoinFlip(crossover_rate_)) {
+                Crossover(parents.first, parents.second, &offspring);
+            } else {
+                // TODO(boingoing): Should we flip an even coin here to decide which parent to duplicate?
+                offspring = parents.first;
+            }
+
+            // Mutate offspring.
+            Mutate(&offspring, current_mutation_rate);
+        }
+    }
 
     // Score and sort the current population.
     // This population is either the result of Initialize() or a previous Step() operation.
-    Evaluate(&population_);
+    Evaluate(&current_population);
 
-    // Save current population into last generation population.
-    population_.swap(last_generation_population_);
-
-    // Elitism
-    // Add the best individuals from last generation into the current population.
-    // Note: last_generation_population_ must already be sorted with best individuals at the front.
-    for (size_t i = 0; i < elite_count_; i++) {
-        // Overwrite the first i members of population with those from last generation.
-        population_[i] = last_generation_population_[i];
-    }
-
-    // Mutated elitism
-    // Take the best individuals from the last generation but mutate them by a variable rate.
-    for (size_t i = 0; i < mutated_elite_count_; i++) {
-        auto& mutated_elite = population_[elite_count_ + i];
-        mutated_elite = last_generation_population_[i];
-        Mutate(&mutated_elite, mutated_elite_mutation_rate_);
-    }
-
-    // Get the mutation rate for the current generation.
-    // Note: This can depend on the population already having been evaluated.
-    const double current_mutation_rate = GetCurrentMutationRate();
-    // Initialize the selector.
-    InitializeSelector(&last_generation_population_);
-
-    // We already added elite_count_ + mutated_elite_count_ individuals based on the last generation.
-    size_t current_population_size = elite_count_ + mutated_elite_count_;
-    // Create offspring from individuals in last generation.
-    while (current_population_size < population_size_) {
-        auto& offspring = population_[current_population_size++];
-
-        // Select a couple from the last generation.
-        const auto parents = SelectParents(last_generation_population_);
-
-        // See if we will do crossover or duplicate a parent.
-        if (random_.CoinFlip(crossover_rate_)) {
-            Crossover(parents.first, parents.second, &offspring);
-        } else {
-            // TODO(boingoing): Should we flip an even coin here to decide which parent to duplicate?
-            offspring = parents.first;
-        }
-
-        // Mutate offspring.
-        Mutate(&offspring, current_mutation_rate);
-    }
+    current_generation_++;
 }
 
 void GeneticAlgorithm::Evaluate(Population* population) {

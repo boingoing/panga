@@ -10,6 +10,7 @@
 
 namespace panga {
 
+class Genome;
 class Individual;
 class RandomWrapper;
 
@@ -21,12 +22,31 @@ class RandomWrapper;
  * must be sorted in decreasing fitness order with the Individual at index 0
  * being the most fit.
  */
-class Population : public std::vector<Individual> {
+class Population {
 public:
-    Population() = default;
-    Population(const Population& rhs) = default;
-    Population& operator=(const Population& rhs) = default;
+    Population() = delete;
+    explicit Population(const Genome& genome);
+    Population(const Population& rhs) = delete;
+    Population& operator=(const Population& rhs) = delete;
     ~Population() = default;
+
+    /**
+     * Return the number of individuals in the population.
+     */
+    size_t Size() const;
+
+    /**
+     * Resize the population to hold |size| individuals.<br/>
+     * If |size| is greater than the current size of the population, new random individuals will be added until we reach |size| individuals.
+     */
+    void Resize(size_t size, RandomWrapper* random);
+
+    /**
+     * Initialize the population based on |initial_population|.<br/>
+     * Clears any individuals currently in the population.
+     * @param initial_population We will construct new population members and interpret these values as binary chromosome data.
+     */
+    void Initialize(const std::vector<const BitVector>& initial_population);
 
     /**
      * Initialize the set of partial sums we use for the roulette wheel selector.<br/>
@@ -39,6 +59,11 @@ public:
      * This must be called before using the selection functions as they rely on the population being sorted.
      */
     void Sort();
+
+    /**
+     * Replace the individual currently at |index| in the population with |individual|.
+     */
+    void Replace(size_t index, const Individual& individual);
 
     /**
      * Return the Individual with highest fitness value in the population.<br/>
@@ -82,7 +107,9 @@ public:
     const Individual& UniformSelect(RandomWrapper* random) const;
 
     /**
-     * Spin a roulette wheel to select an individual where each slice on the wheel corresponds to the partial sum of a ranked individual. The size of each partial sum on the wheel is relative to the fitness of that individual with more fit individuals having a larger-sized slice.
+     * Spin a roulette wheel to select an individual where each slice on the wheel corresponds to the partial sum of a ranked individual. The size of each partial sum on the wheel is relative to the fitness of that individual with more fit individuals having a larger-sized slice.<br/>
+     * Patial sums must have already been created via InitializePartialSums.
+     * @see InitializePartialSums
      */
     const Individual& RouletteWheelSelect(RandomWrapper* random) const;
 
@@ -97,6 +124,8 @@ public:
     const Individual& RankSelect() const;
 
 private:
+    const Genome& genome_;
+    std::vector<Individual> individuals_;
     std::vector<double> partial_sums_;
     std::vector<size_t> sorted_indices_;
     bool is_sorted_ = false;

@@ -231,7 +231,7 @@ public:
 
     typedef double(*FitnessFunction)(Individual*, void*);
 
-    GeneticAlgorithm() = default;
+    GeneticAlgorithm();
     GeneticAlgorithm(const GeneticAlgorithm& rhs) = delete;
     GeneticAlgorithm& operator=(const GeneticAlgorithm& rhs) = delete;
     ~GeneticAlgorithm() = default;
@@ -444,7 +444,7 @@ public:
      * Initialize the GeneticAlgorithm population based on |initial_population|.
      * @param initial_population We will construct new population members and interpret these values as binary chromosome data.
      */
-    void SetInitialPopulation(const std::vector<const BitVector*>& initial_population);
+    void SetInitialPopulation(const std::vector<const BitVector>& initial_population);
 
     /**
      * Perform one step of the genetic algorithm:<br/>
@@ -484,10 +484,29 @@ protected:
     std::pair<const Individual&, const Individual&> SelectParents(const Population& population);
     const Individual& SelectOne(const Population& population);
 
+    /**
+     * We store two populations and alternate between them between generations. In this way, the previous and current generations are always available.<br/>
+     * This function will always return the current population.<br/>
+     * The current population is the one which is being built, evaluated, and scored during the current generation of the genetic algorithm.
+     * @see populations_
+     * @see GetLastGenerationPopulation
+     */
+    Population& GetCurrentPopulation();
+
+    /**
+     * We store two populations and alternate between them between generations. In this way, the previous and current generations are always available.<br/>
+     * This function will always return the population from the previous generation.<br/>
+     * The previous generation population is the one which was built, evaluated, and scored during the previous generation of the genetic algorithm.
+     * @see populations_
+     * @see GetCurrentPopulation
+     */
+    Population& GetLastGenerationPopulation();
+
 private:
     Genome genome_;
     Population population_;
     Population last_generation_population_;
+    std::vector<Population> populations_;
     MutationRateSchedule mutation_rate_schedule_ = MutationRateSchedule::Constant;
 
     size_t population_size_ = 0;
