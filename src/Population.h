@@ -30,6 +30,7 @@ public:
     Population() = delete;
     explicit Population(const Genome& genome);
     Population(const Population& rhs) = delete;
+    Population(Population&& rhs) = default;
     Population& operator=(const Population& rhs) = delete;
     ~Population() = default;
 

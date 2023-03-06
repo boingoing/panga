@@ -37,6 +37,7 @@ protected:
 public:
     Genome() = default;
     Genome(const Genome& rhs) = delete;
+    Genome(Genome&& rhs) = default;
     Genome& operator=(const Genome& rhs) = delete;
     ~Genome() = default;
 

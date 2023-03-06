@@ -3,23 +3,19 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 
-#include <vector>
-#include <iostream>
 #include <cassert>
 #include <cstring>
+#include <iostream>
 #include <sstream>
+#include <vector>
 
-#include "GeneticAlgorithm.h"
 #include "BitVector.h"
+#include "GeneticAlgorithm.h"
 #include "Individual.h"
-
-using namespace panga;
-
-bool VerboseOutput = false;
 
 #define AssertTrue(expr, msg) \
 if (!(expr)) { \
-    std::cerr << "Failure: " << msg << " (" << #expr << ")" << std::endl; \
+    std::cerr << "Failure: " << (msg) << " (" << #expr << ")" << std::endl; \
     assert(expr); \
     return false; \
 }
@@ -30,37 +26,44 @@ if (!(expr)) { \
     return -1; \
 }
 
+namespace panga {
+
+bool VerboseOutput = false;
+
 struct TestUserData {
-    size_t currentIndividual;
-    size_t currentGeneration;
-    BitVector targetBits;
+    size_t current_individual;
+    size_t current_generation;
+    BitVector target_bits;
 };
 
-double TestObjective(Individual* individual, void* userData) {
-    TestUserData* testUserData = static_cast<TestUserData*>(userData);
-    size_t failBits = testUserData->targetBits.HammingDistance(individual);
+double TestObjective(Individual* individual, void* user_test_data) {
+    auto* test_data = static_cast<TestUserData*>(user_test_data);
+    const auto fail_bits = test_data->target_bits.HammingDistance(*individual);
 
-    //std::cout << "Individual " << testUserData->currentGeneration << ":" << testUserData->currentIndividual << " => Error " << failBits << std::endl;
+    if (VerboseOutput) {
+      std::cout << "Individual " << test_data->current_generation << ":" << test_data->current_individual << " => Error " << fail_bits << std::endl;
+    }
 
-    testUserData->currentIndividual++;
+    test_data->current_individual++;
 
-    return (double) failBits;
+    return static_cast<double>(fail_bits);
 }
 
 bool TestSolveMatchingProblem(const char* target) {
     GeneticAlgorithm ga;
     Genome& genome = ga.GetGenome();
-    TestUserData userData;
+    TestUserData test_data;
 
     if (target != nullptr) {
         size_t len = strlen(target);
-        userData.targetBits.FromString(target, len);
+        test_data.target_bits.FromString(target, len);
     } else {
-        userData.targetBits.SetBitCount(2000);
+        constexpr size_t test_bit_count = 2000U;
+        test_data.target_bits.SetBitCount(test_bit_count);
     }
 
-    genome.AddBooleanGenes(userData.targetBits.GetBitCount());
-    AssertTrue(genome.BitsRequired() == userData.targetBits.GetBitCount(), "Genome encodes correct number of bits");
+    genome.AddBooleanGenes(test_data.target_bits.GetBitCount());
+    AssertTrue(genome.BitsRequired() == test_data.target_bits.GetBitCount(), "Genome encodes correct number of bits");
 
     ga.SetPopulationSize(100);
     ga.SetTotalGenerations(100);
@@ -78,64 +81,70 @@ bool TestSolveMatchingProblem(const char* target) {
     ga.SetKPointCrossoverPointCount(5);
     ga.SetProportionalMutationBitCount(1);
     ga.SetAllowSameParentCouples(true);
-    ga.SetUserData(&userData);
+    ga.SetUserData(&test_data);
     ga.Initialize();
 
     // Minimum score will fall below 1 when we've solved the problem
-    do {
+    constexpr size_t max_generation = 10000;
+    while (ga.GetCurrentGeneration() < max_generation) {
         // Pass the current generation and individual to the fitness function.
         // Reset current individual for this population
-        userData.currentIndividual = 1;
+        test_data.current_individual = 1;
         // Set this before we call Step (which calls the fitness function) so
         // add one to the current generation.
-        userData.currentGeneration = ga.GetCurrentGeneration() + 1;
+        test_data.current_generation = ga.GetCurrentGeneration() + 1;
 
         ga.Step();
+        const auto& population = ga.GetPopulation();
 
         if (VerboseOutput) {
             std::cout << "Generation " << ga.GetCurrentGeneration()
-                << " => avg: " << ga.GetAverageScore()
-                << " min: " << ga.GetMinimumScore()
-                << " stdev: " << ga.GetScoreStandardDeviation()
-                << " popdiv: " << ga.GetPopulationDiversity()
+                << " => avg: " << population.GetAverageScore()
+                << " min: " << population.GetMinimumScore()
+                << " stdev: " << population.GetScoreStandardDeviation()
+                << " popdiv: " << population.GetPopulationDiversity()
                 << std::endl;
         }
-    } while (ga.GetMinimumScore() > 0.5);
 
-    return true;
+        if (population.GetMinimumScore() < 1.0) { 
+            return true;
+        }
+    }
+
+    return false;
 }
 
-bool TestCrossoverGenes(size_t geneCount, size_t geneWidth) {
+bool TestCrossoverGenes(size_t gene_count, size_t gene_width) {
     Genome genome;
-    for (size_t i = 0; i < geneCount; i++) {
-        size_t geneIndex = genome.AddGene(geneWidth);
-        AssertTrue(geneIndex == i, "Gene index");
+    for (size_t i = 0; i < gene_count; i++) {
+        const size_t index = genome.AddGene(gene_width);
+        AssertTrue(index == i, "Gene index");
     }
-    AssertTrue(genome.BitsRequired() == geneWidth * geneCount, "Genes add up to the corect length");
+    AssertTrue(genome.BitsRequired() == gene_width * gene_count, "Genes add up to the corect length");
 
-    Individual left(&genome);
-    Individual right(&genome);
-    Individual offspring(&genome);
+    Individual left(genome);
+    Individual right(genome);
+    Individual offspring(genome);
     AssertTrue(genome.BitsRequired() == left.GetBitCount(), "Individuals based on a genome have length eqaul to the genome bits required");
 
     // Alternate gene values between all 0s and all 1s
-    for (size_t i = 0; i < geneCount; i++) {
-        uint64_t leftValue = i % 2 ? std::numeric_limits<uint64_t>::max() : 0;
-        uint64_t rightValue = i % 2 ? 0 : std::numeric_limits<uint64_t>::max();
-        left.EncodeIntegerGene<uint64_t, false>(i, leftValue);
-        right.EncodeIntegerGene<uint64_t, false>(i, rightValue);
+    for (size_t i = 0; i < gene_count; i++) {
+        const uint64_t left_value = i % 2U ? std::numeric_limits<uint64_t>::max() : 0;
+        const uint64_t right_value = i % 2U ? 0 : std::numeric_limits<uint64_t>::max();
+        left.EncodeIntegerGene<uint64_t, false>(i, left_value);
+        right.EncodeIntegerGene<uint64_t, false>(i, right_value);
     }
 
-    RandomWrapper randomWrapper;
+    RandomWrapper random;
 
     // Perform crossover respecting gene boundaries.
     // This means we will take all the bits of a gene instead of cutting them up.
-    Individual::UniformCrossover<false>(&left, &right, &offspring, &randomWrapper);
+    Individual::UniformCrossover(left, right, &offspring, &random, false);
 
-    for (size_t i = 0; i < geneCount; i++) {
-        uint64_t value = offspring.DecodeIntegerGene<uint64_t, false>(i);
-        uint64_t maxValue = std::numeric_limits<uint64_t>::max() >> (sizeof(uint64_t)*8 - geneWidth);
-        AssertTrue(value == 0 || value == maxValue, "Decoded value should be all 1s or all 0s");
+    for (size_t i = 0; i < gene_count; i++) {
+        const uint64_t value = offspring.DecodeIntegerGene<uint64_t, false>(i);
+        const uint64_t max_value = std::numeric_limits<uint64_t>::max() >> (sizeof(uint64_t) * CHAR_BIT - gene_width);
+        AssertTrue(value == 0 || value == max_value, "Decoded value should be all 1s or all 0s");
     }
 
     return true;
@@ -157,10 +166,10 @@ bool TestBitVectorToString(BitVector* bv, const char* expectedBinString, const c
 
     BitVector tbv;
     tbv.FromString(expectedBinString, strlen(expectedBinString));
-    AssertTrue(bv->Equals(&tbv), "BitVector::FromString produces correct BitVector");
+    AssertTrue(bv->Equals(tbv), "BitVector::FromString produces correct BitVector");
 
     tbv.FromStringHex(expectedHexString, strlen(expectedHexString));
-    AssertTrue(bv->Equals(&tbv), "BitVector::FromStringHex produces correct BitVector");
+    AssertTrue(bv->Equals(tbv), "BitVector::FromStringHex produces correct BitVector");
 
     return true;
 }
@@ -188,7 +197,7 @@ bool BitVectorSanityTests() {
     return true;
 }
 
-int main(int argc, const char** argv) {
+bool DoTests(int argc, const char** argv) {
     const char* target = nullptr;
     if (argc > 1) {
         target = argv[1];
@@ -205,4 +214,10 @@ int main(int argc, const char** argv) {
     std::cout << "All tests passed!" << std::endl;
 
     return 0;
+}
+
+}  // namespace panga
+
+int main(int argc, const char** argv) {
+    return panga::DoTests(argc, argv);
 }

@@ -21,6 +21,7 @@ public:
     explicit Individual(const Genome& genome);
     Individual(const Genome& genome, const BitVector& chromosome);
     Individual(const Individual& rhs) = delete;
+    Individual(Individual&& rhs) = default;
     ~Individual() = default;
 
     /**

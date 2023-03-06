@@ -8,10 +8,14 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <random>
 
 namespace panga {
 
+/**
+ * A simple wrapper which may be used to generate random values.
+ */
 class RandomWrapper {
 public:
     RandomWrapper();
@@ -19,24 +23,39 @@ public:
     RandomWrapper& operator=(const RandomWrapper& rhs) = delete;
     ~RandomWrapper() = default;
 
+    /**
+     * Generates a uniformly random integer of type |IntegerType| in the range [|min|, |max|].
+     */
     template <typename IntegerType = uint32_t>
     IntegerType RandomInteger(IntegerType min, IntegerType max) {
         std::uniform_int_distribution<IntegerType> dist(min, max);
-        return dist(engine_);
+        return dist(Engine());
     }
 
+    /**
+     * Generates a uniformly random floating point value of type |FloatType| in the range [|min|, |max|).
+     */
     template <typename FloatType = double>
     FloatType RandomFloat(FloatType min, FloatType max) {
         std::uniform_real_distribution<FloatType> dist(min, max);
-        return dist(engine_);
+        return dist(Engine());
     }
 
+    /**
+     * Generates a weighted coin flip with |probability| chance of producing the value true.
+     */
     bool CoinFlip(double probability);
 
+    /**
+     * Generates a uniformly random byte.
+     */
     std::byte RandomByte();
 
+protected:
+    std::mt19937& Engine();
+
 private:
-    std::mt19937 engine_;
+    std::optional<std::mt19937> engine_;
 };
 
 }  // namespace panga

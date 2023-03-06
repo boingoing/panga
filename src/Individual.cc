@@ -6,10 +6,10 @@
 #include <algorithm>
 #include <cassert>
 
-#include "Individual.h"
 #include "Genome.h"
+#include "Individual.h"
 
-using namespace panga;
+namespace panga {
 
 Individual::Individual(const Genome& genome) : Chromosome(genome) {
 }
@@ -49,3 +49,5 @@ void Individual::SetFitness(double fitness) {
 void Individual::SetScore(double score) {
     score_ = score;
 }
+
+}  // namespace panga

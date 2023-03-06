@@ -16,11 +16,8 @@ size_t Population::Size() const {
 }
 
 void Population::Resize(size_t size, RandomWrapper* random) {
-    // If we're shrinking the population, no need to construct new individuals.
-    if (individuals_.size() >= size) {
-        individuals_.resize(size);
-        return;
-    }
+    // TODO(boingoing): Only support extending the population. To shrink it, we'll need to support move semantics for Individuals.
+    assert(individuals_.size() < size);
 
     // If we're inserting new random individuals, construct them in the vector.
     while (individuals_.size() < size) {
@@ -182,7 +179,7 @@ void Population::Evaluate(FitnessFunction fitness_function, void* user_data) {
 const Individual& Population::UniformSelect(RandomWrapper* random) const {
     assert(!individuals_.empty());
 
-    size_t index = random->RandomInteger<size_t>(0, individuals_.size() - 1U);
+    const auto index = random->RandomInteger<size_t>(0, individuals_.size() - 1U);
     return individuals_[index];
 }
 
@@ -190,7 +187,7 @@ const Individual& Population::RouletteWheelSelect(RandomWrapper* random) const {
     assert(!individuals_.empty());
     assert(individuals_.size() == partial_sums_.size());
 
-    const double cutoff = random->RandomFloat<double>(0.0, 1.0);
+    const auto cutoff = random->RandomFloat<double>(0.0, 1.0);
     size_t lower = 0;
     size_t upper = individuals_.size() - 1U;
 

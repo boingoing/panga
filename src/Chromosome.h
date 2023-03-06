@@ -28,6 +28,7 @@ class Chromosome : public BitVector {
 public:
     explicit Chromosome(const Genome& genome);
     Chromosome(const Chromosome& rhs) = delete;
+    Chromosome(Chromosome&& rhs) = default;
     Chromosome& operator=(const Chromosome& rhs) = delete;
     ~Chromosome() = default;
 
@@ -59,10 +60,9 @@ public:
 
         const size_t gene_bit_index = genome_.GetGeneStartBitIndex(gene_index);
         const size_t gene_width = genome_.GetGeneBitWitdh(gene_index);
-        constexpr size_t bits_per_byte = 8;
-        assert(sizeof(IntegerType) * bits_per_byte >= gene_width);
+        assert(sizeof(IntegerType) * CHAR_BIT >= gene_width);
 
-        IntegerType value = GetInt<IntegerType>(gene_bit_index, gene_width);
+        auto value = GetInt<IntegerType>(gene_bit_index, gene_width);
         if (use_gray_encoding) {
             value = DecodeGray<IntegerType>(value);
         }
@@ -83,8 +83,7 @@ public:
     void EncodeIntegerGene(size_t gene_index, IntegerType value) {
         const size_t gene_bit_index = genome_.GetGeneStartBitIndex(gene_index);
         const size_t gene_width = genome_.GetGeneBitWitdh(gene_index);
-        constexpr size_t bits_per_byte = 8;
-        assert(sizeof(IntegerType) * bits_per_byte >= gene_width);
+        assert(sizeof(IntegerType) * CHAR_BIT >= gene_width);
 
         if (use_gray_encoding) {
             value = EncodeGray<IntegerType>(value);

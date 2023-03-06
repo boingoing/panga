@@ -442,7 +442,7 @@ public:
 
     /**
      * Initialize the GeneticAlgorithm population based on |initial_population|.<br/>
-     * Note: We need to call this before calling Initialize()
+     * Note: We need to call this before calling Initialize().
      * @param initial_population We will construct new population members and interpret these values as binary chromosome data.
      */
     void SetInitialPopulation(const std::vector<BitVector>& initial_population);
@@ -513,6 +513,11 @@ protected:
     Population& GetLastGenerationPopulation();
 
 private:
+static constexpr double DefaultMutationRate = 0.0005;
+static constexpr double DefaultCrossoverRate = 0.9;
+static constexpr double DefaultSelfAdaptiveMutationDiversityFloor = 0.0002;
+static constexpr double DefaultSelfAdaptiveMutationAggressiveRate = 0.1;
+
     Genome genome_;
     std::vector<Population> populations_;
     RandomWrapper random_;
@@ -527,14 +532,14 @@ private:
     size_t elite_count_ = 0;
     size_t mutated_elite_count_ = 0;
 
-    double mutation_rate_ = 0.0005;
-    double crossover_rate_ = 0.9;
+    double mutation_rate_ = DefaultMutationRate;
+    double crossover_rate_ = DefaultCrossoverRate;
     double mutated_elite_mutation_rate_ = 0.0;
 
     size_t tournament_size_ = 2;
     size_t k_point_crossover_point_count_ = 3;
-    double self_adaptive_mutation_diversity_floor_ = 0.0002;
-    double self_adaptive_mutation_aggressive_rate_ = 0.1;
+    double self_adaptive_mutation_diversity_floor_ = DefaultSelfAdaptiveMutationDiversityFloor;
+    double self_adaptive_mutation_aggressive_rate_ = DefaultSelfAdaptiveMutationAggressiveRate;
     size_t proportional_mutation_bit_count_ = 1;
 
     CrossoverType crossover_type_ = CrossoverType::Uniform;
