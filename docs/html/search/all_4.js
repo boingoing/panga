@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['decodebooleangene',['DecodeBooleanGene',['../classpanga_1_1Chromosome.html#a620ba20ab9ee8767525be9f54e8005bf',1,'panga::Chromosome']]],
-  ['decodefloat',['DecodeFloat',['../classpanga_1_1Chromosome.html#a2addfe300d255891acfc4889a4acbc31',1,'panga::Chromosome']]],
-  ['decodefloatgene',['DecodeFloatGene',['../classpanga_1_1Chromosome.html#a14fe0acd3638f99a0b5b6347caf86b54',1,'panga::Chromosome']]],
-  ['decodegray',['DecodeGray',['../classpanga_1_1Chromosome.html#a9733562fdbd4cb117ae332cc9611fe2e',1,'panga::Chromosome']]],
-  ['decodeintegergene',['DecodeIntegerGene',['../classpanga_1_1Chromosome.html#a85939a40987941de20aee650d018206a',1,'panga::Chromosome']]],
-  ['deletepopulation',['DeletePopulation',['../classpanga_1_1GeneticAlgorithm.html#a71413b202033cabb4b2c12e2a9e0e04a',1,'panga::GeneticAlgorithm']]],
-  ['deterministic',['Deterministic',['../classpanga_1_1GeneticAlgorithm.html#a84ecf735778d44eceefdc7c9f5a4f21bac172d0b7b7d4c61a931d50369d37b11f',1,'panga::GeneticAlgorithm']]]
+  ['encodebooleangene_18',['EncodeBooleanGene',['../classpanga_1_1Chromosome.html#a02f469e1ff1d377a6c1d05947024a1ce',1,'panga::Chromosome']]],
+  ['encodefloat_19',['EncodeFloat',['../classpanga_1_1Chromosome.html#a0c57adfca46a2cc5ea778f3661d639f6',1,'panga::Chromosome']]],
+  ['encodefloatgene_20',['EncodeFloatGene',['../classpanga_1_1Chromosome.html#a2e223df6eab04c6b2d43e014300f5c98',1,'panga::Chromosome']]],
+  ['encodegray_21',['EncodeGray',['../classpanga_1_1Chromosome.html#ae85b03f07d3bdfd05af3894313b127b1',1,'panga::Chromosome']]],
+  ['encodeintegergene_22',['EncodeIntegerGene',['../classpanga_1_1Chromosome.html#a079b03835429b21b09adf831672a35e3',1,'panga::Chromosome']]],
+  ['equals_23',['Equals',['../classpanga_1_1BitVector.html#ab5cb676fee16cbe00ea90b6d660e0fab',1,'panga::BitVector::Equals(const BitVector &amp;rhs, size_t bits_to_compare) const'],['../classpanga_1_1BitVector.html#a8a97c5bd1b71a9c374fac170226f8a2b',1,'panga::BitVector::Equals(const BitVector &amp;rhs) const']]],
+  ['evaluate_24',['Evaluate',['../classpanga_1_1Population.html#a08ede33788fb8e0876dea5e47f7ddd6e',1,'panga::Population']]]
 ];

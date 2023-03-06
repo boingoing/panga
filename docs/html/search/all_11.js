@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['uniform',['Uniform',['../classpanga_1_1GeneticAlgorithm.html#a121354609fbc300abfb96556935f4b35af19516d11f2946f894070e92fcb56b6d',1,'panga::GeneticAlgorithm::Uniform()'],['../classpanga_1_1GeneticAlgorithm.html#a3653afdb62876d5d18254dba4de27a6eaf19516d11f2946f894070e92fcb56b6d',1,'panga::GeneticAlgorithm::Uniform()']]],
-  ['unset',['Unset',['../classpanga_1_1BitVector.html#abb2d1b6957e3165f8cc3280daccce194',1,'panga::BitVector']]]
+  ['writebytes_132',['WriteBytes',['../classpanga_1_1BitVector.html#ae2175fd5bf406105baaac480bf19ce2d',1,'panga::BitVector']]],
+  ['writeint_133',['WriteInt',['../classpanga_1_1BitVector.html#a1bbb1dcb7d3b778cc155ba664356e332',1,'panga::BitVector']]]
 ];

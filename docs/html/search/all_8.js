@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['hammingdistance',['HammingDistance',['../classpanga_1_1BitVector.html#ab677b2094a8a06ee08cec1c719908a4a',1,'panga::BitVector']]],
-  ['hexformat',['HexFormat',['../classpanga_1_1BitVector.html#ad734622bba51ed8ab3fa185fbe2985ec',1,'panga::BitVector']]],
-  ['hexformat_5ft',['HexFormat_t',['../structpanga_1_1BitVector_1_1HexFormat__t.html',1,'panga::BitVector']]],
-  ['hexformatwrapper',['HexFormatWrapper',['../structpanga_1_1BitVector_1_1HexFormatWrapper.html',1,'panga::BitVector']]]
+  ['individual_63',['Individual',['../classpanga_1_1Individual.html',1,'panga']]],
+  ['initialize_64',['Initialize',['../classpanga_1_1GeneticAlgorithm.html#a7f892c25f0c54a772c3a1663d31cfa19',1,'panga::GeneticAlgorithm::Initialize()'],['../classpanga_1_1Population.html#ad9e4a13cacebac3f8e5e508a635adabd',1,'panga::Population::Initialize()']]],
+  ['initializepartialsums_65',['InitializePartialSums',['../classpanga_1_1Population.html#aa03ed3bc28d06d57b8ea279cd74b80a1',1,'panga::Population']]],
+  ['initializeselector_66',['InitializeSelector',['../classpanga_1_1GeneticAlgorithm.html#ad9a0ea45cbf5f07cec741ad3eacb3c80',1,'panga::GeneticAlgorithm']]]
 ];

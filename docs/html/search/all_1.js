@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['addbooleangenes',['AddBooleanGenes',['../classpanga_1_1Genome.html#a915b97071a216d1ccf01f064af888be8',1,'panga::Genome']]],
-  ['addgene',['AddGene',['../classpanga_1_1Genome.html#ab5b50407e016a4bb3f921f94b2ebbfb4',1,'panga::Genome']]]
+  ['bitsrequired_2',['BitsRequired',['../classpanga_1_1Genome.html#a75eb4ff4d71d5e8689336318858aac9a',1,'panga::Genome']]],
+  ['bitvector_3',['BitVector',['../classpanga_1_1BitVector.html',1,'panga']]]
 ];
