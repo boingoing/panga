@@ -14,6 +14,7 @@ Checks: 'bugprone*,
          -bugprone-reserved-identifier,
          -cert-dcl37-c,
          -cert-dcl51-cpp,
+         -cert-err58-cpp,
          -llvm-header-guard,
          -llvmlibc-callee-namespace,
          -llvmlibc-implementation-in-namespace,
@@ -22,6 +23,7 @@ Checks: 'bugprone*,
          -misc-non-private-member-variables-in-classes,
          -modernize-use-nodiscard,
          -modernize-use-trailing-return-type,
-         -readability-identifier-length'
+         -readability-identifier-length,
+         -readability-simplify-boolean-expr'
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.'

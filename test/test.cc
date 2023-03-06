@@ -26,7 +26,13 @@ if (!(expr)) { \
     return -1; \
 }
 
-namespace panga {
+using panga::BitVector;
+using panga::GeneticAlgorithm;
+using panga::Genome;
+using panga::Individual;
+using panga::RandomWrapper;
+
+namespace testing {
 
 bool VerboseOutput = false;
 
@@ -55,7 +61,7 @@ bool TestSolveMatchingProblem(const char* target) {
     TestUserData test_data;
 
     if (target != nullptr) {
-        size_t len = strlen(target);
+        const size_t len = strlen(target);
         test_data.target_bits.FromString(target, len);
     } else {
         constexpr size_t test_bit_count = 2000U;
@@ -65,20 +71,28 @@ bool TestSolveMatchingProblem(const char* target) {
     genome.AddBooleanGenes(test_data.target_bits.GetBitCount());
     AssertTrue(genome.BitsRequired() == test_data.target_bits.GetBitCount(), "Genome encodes correct number of bits");
 
-    ga.SetPopulationSize(100);
-    ga.SetTotalGenerations(100);
-    ga.SetMutationRate(0.0005);
-    ga.SetCrossoverRate(0.99);
+    constexpr size_t population_size = 100;
+    constexpr size_t total_generations = 100;
+    constexpr double mutation_rate = 0.0005;
+    constexpr double crossover_rate = 0.99;
+    constexpr double mutated_elite_rate = 0.5;
+    constexpr size_t tournament_size = 5;
+    constexpr size_t k_point_count = 5;
+
+    ga.SetPopulationSize(population_size);
+    ga.SetTotalGenerations(total_generations);
+    ga.SetMutationRate(mutation_rate);
+    ga.SetCrossoverRate(crossover_rate);
     ga.SetEliteCount(1);
     ga.SetMutatedEliteCount(0);
-    ga.SetMutatedEliteMutationRate(0.5);
+    ga.SetMutatedEliteMutationRate(mutated_elite_rate);
     ga.SetFitnessFunction(TestObjective);
     ga.SetMutationRateSchedule(GeneticAlgorithm::MutationRateSchedule::Proportional);
     ga.SetCrossoverType(GeneticAlgorithm::CrossoverType::Uniform);
     ga.SetMutatorType(GeneticAlgorithm::MutatorType::Flip);
     ga.SetSelectorType(GeneticAlgorithm::SelectorType::Tournament);
-    ga.SetTournamentSize(5);
-    ga.SetKPointCrossoverPointCount(5);
+    ga.SetTournamentSize(tournament_size);
+    ga.SetKPointCrossoverPointCount(k_point_count);
     ga.SetProportionalMutationBitCount(1);
     ga.SetAllowSameParentCouples(true);
     ga.SetUserData(&test_data);
@@ -129,8 +143,8 @@ bool TestCrossoverGenes(size_t gene_count, size_t gene_width) {
 
     // Alternate gene values between all 0s and all 1s
     for (size_t i = 0; i < gene_count; i++) {
-        const uint64_t left_value = i % 2U ? std::numeric_limits<uint64_t>::max() : 0;
-        const uint64_t right_value = i % 2U ? 0 : std::numeric_limits<uint64_t>::max();
+        const uint64_t left_value = i % 2U == 0 ? std::numeric_limits<uint64_t>::max() : 0;
+        const uint64_t right_value = i % 2U == 0 ? 0 : std::numeric_limits<uint64_t>::max();
         left.EncodeIntegerGene<uint64_t, false>(i, left_value);
         right.EncodeIntegerGene<uint64_t, false>(i, right_value);
     }
@@ -142,8 +156,8 @@ bool TestCrossoverGenes(size_t gene_count, size_t gene_width) {
     Individual::UniformCrossover(left, right, &offspring, &random, false);
 
     for (size_t i = 0; i < gene_count; i++) {
-        const uint64_t value = offspring.DecodeIntegerGene<uint64_t, false>(i);
-        const uint64_t max_value = std::numeric_limits<uint64_t>::max() >> (sizeof(uint64_t) * CHAR_BIT - gene_width);
+        const auto value = offspring.DecodeIntegerGene<uint64_t, false>(i);
+        const auto max_value = std::numeric_limits<uint64_t>::max() >> (sizeof(uint64_t) * CHAR_BIT - gene_width);
         AssertTrue(value == 0 || value == max_value, "Decoded value should be all 1s or all 0s");
     }
 
@@ -151,7 +165,8 @@ bool TestCrossoverGenes(size_t gene_count, size_t gene_width) {
 }
 
 bool TestBitVectorToString(BitVector* bv, const char* expectedBinString, const char* expectedHexString) {
-    char buf[2000];
+    constexpr size_t buf_size = 2000;
+    char buf[buf_size];
     bv->ToStringHex(buf, sizeof(buf));
     AssertTrue(std::strcmp(buf, expectedHexString) == 0, "BitVector::ToStringHex produces expected result");
     std::stringstream sstr1;
@@ -174,30 +189,47 @@ bool TestBitVectorToString(BitVector* bv, const char* expectedBinString, const c
     return true;
 }
 
+struct BitVectorInt {
+    int value;
+    size_t bit_index;
+    size_t bit_width;
+};
+
+struct BitVectorTest {
+    size_t bit_count;
+    std::vector<BitVectorInt> ints;
+    std::vector<size_t> bits;
+    const char* bin_string;
+    const char* hex_string;
+};
+
+const BitVectorTest BitVectorTests[] = {
+    {20, {{0xff, 0, 8}}, {}, "00000000000011111111", "0000ff"},
+    {20, {{0xff, 0, 8}, {0xff, 18, 2}}, {}, "11000000000011111111", "0c00ff"},
+    {20, {{0xff, 0, 8}, {0xff, 18, 2}, {524288, 0, 20}}, {}, "10000000000000000000", "080000"},
+    {20, {{0xff, 0, 8}, {0xff, 18, 2}, {524288, 0, 20}, {0xff, 4, 8}}, {}, "10000000111111110000", "080ff0"},
+    {20, {}, {16}, "00010000000000000000", "010000"},
+    {100, {{0xfff, 1, 16}, {0xfff, 81, 16}}, {}, "0000000111111111111000000000000000000000000000000000000000000000000000000000000000000001111111111110", "001ffe00000000000000001ffe"},
+
+};
+
 bool BitVectorSanityTests() {
-    BitVector bv;
-    bv.SetBitCount(20);
-    bv.SetInt(0xff, 0, 8);
-    TestBitVectorToString(&bv, "00000000000011111111", "0000ff");
-    bv.SetInt(0xff, 18, 2);
-    TestBitVectorToString(&bv, "11000000000011111111", "0c00ff");
-    bv.SetInt(524288, 0, 20);
-    TestBitVectorToString(&bv, "10000000000000000000", "080000");
-    bv.SetInt(0xff, 4, 8);
-    TestBitVectorToString(&bv, "10000000111111110000", "080ff0");
-    bv.Clear();
-    bv.Set(16);
-    TestBitVectorToString(&bv, "00010000000000000000", "010000");
-    bv.Clear();
-    bv.SetBitCount(100);
-    bv.SetInt(0xfff, 1, 16);
-    bv.SetInt(0xfff, 81, 16);
-    TestBitVectorToString(&bv, "0000000111111111111000000000000000000000000000000000000000000000000000000000000000000001111111111110", "001ffe00000000000000001ffe");
+    for (const auto& test : BitVectorTests) {
+        BitVector bv;
+        bv.SetBitCount(test.bit_count);
+        for (const auto& i : test.ints) {
+            bv.SetInt(i.value, i.bit_index, i.bit_width);
+        }
+        for (const auto& b : test.bits) {
+            bv.Set(b);
+        }
+        TestBitVectorToString(&bv, test.bin_string, test.hex_string);
+    }
 
     return true;
 }
 
-bool DoTests(int argc, const char** argv) {
+int DoTests(int argc, const char** argv) {
     const char* target = nullptr;
     if (argc > 1) {
         target = argv[1];
@@ -216,8 +248,14 @@ bool DoTests(int argc, const char** argv) {
     return 0;
 }
 
-}  // namespace panga
+}  // namespace testing
 
 int main(int argc, const char** argv) {
-    return panga::DoTests(argc, argv);
+  try {
+    return testing::DoTests(argc, argv);
+  } catch (...) {
+    std::cout << "Caught exception running tests.";
+    return -1;
+  }
+  return 0;
 }
