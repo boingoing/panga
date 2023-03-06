@@ -343,10 +343,11 @@ void BitVector::FromStringHex(const char* buffer, size_t buffer_length) {
   this->SetBitCount(buffer_length / 2U * BitsPerByte);
 
   constexpr int radix = 16;
-  char temp_buffer[3] = {0, 0, 0};
+  char temp_buffer[3];
   size_t i = 0;
   for (std::byte& b : this->bytes_) {
     strncpy(temp_buffer, buffer + buffer_length - 2U * ++i, 2U);
+    temp_buffer[2] = '\0';
     b = static_cast<std::byte>(strtoul(temp_buffer, nullptr, radix));
   }
 }

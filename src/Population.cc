@@ -223,6 +223,14 @@ const Individual& Population::TournamentSelect(size_t tournament_size,
                                                RandomWrapper* random) const {
   assert(tournament_size > 0);
 
+  // If asserts are turned off, we might deref a nullptr to return below. As a
+  // precaution, just return a uniform selector value here.
+  // TODO(boingoing): Should make these selector methods return std::optional,
+  // probably.
+  if (tournament_size == 0) {
+    return UniformSelect(random);
+  }
+
   const Individual* selected = nullptr;
 
   // Choose random individuals from the population to be part of the tournament.
