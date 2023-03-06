@@ -19,7 +19,7 @@ namespace panga {
  */
 class RandomWrapper {
  public:
-  RandomWrapper();
+  RandomWrapper() = default;
   RandomWrapper(const RandomWrapper& rhs) = delete;
   RandomWrapper& operator=(const RandomWrapper& rhs) = delete;
   ~RandomWrapper() = default;
