@@ -449,19 +449,17 @@ public:
 
     /**
      * Perform one step of the genetic algorithm:<br/>
-     *   1. Score the current population of individuals.<br/>
+     *   1. Use the previous generation population to construct the new current
+     *      generation population.<br/>
+     *      * Uses a combination of elitism, crossover, and mutation to
+     *        construct the new population.<br/>
+     *      * Individuals are chosen from the previous population based on their
+     *        fitness scores.<br/>
+     *   2. Score the current population of individuals.<br/>
      *      * This will either be the initial population (if current generation
      *        is 0) or the population we constructed during the previous step
      *        operation.<br/>
      *      * The score operation will leave the population sorted.<br/>
-     *   2. Use the current population to construct the next generation
-     *      population.<br/>
-     *      * Uses a combination of elitism, crossover, and mutation to
-     *        construct the new population.<br/>
-     *      * Individuals are chosen from the current population based on their
-     *        fitness scores.<br/>
-     *      * The next generation population is not scored, yet. It will be
-     *        during the next step operation.<br/>
      *   3. Advance the current generation.
      */
     void Step();
@@ -473,18 +471,36 @@ public:
 
 protected:
     /**
-     * Use the fitness function to score each Individual in the population and then sort the population in terms of decreasing fitness.
+     * Uses the selected crossover operator to construct |offspring| based on |parent1| and |parent2|.
+     * @see SetCrossoverType
+     * @see CrossoverType
      */
-    void Evaluate(Population* population);
-
     void Crossover(const Individual& parent1, const Individual& parent2, Individual* offspring);
+
+    /**
+     * Uses the selected mutation operator to mutate |individual| by |mutation_percentage|.
+     * @see MutatorType
+     * @see SetMutatorType
+     */
     void Mutate(Individual* individual, double mutation_percentage);
+
+    /**
+     * Get the mutation rate we should use for the current generation.<br/>
+     * Note: May depend on the previous population being evaluated so the value returned may be undefined when called while the initial population is the current population. ie: This rate may only make sense during generations greater than 0.
+     */
     double GetCurrentMutationRate();
 
     /**
      * If the selector we're using requires some initialization based on the population, this function will perform that initialization.
      */
     void InitializeSelector(Population* population);
+
+    /**
+     * Uses the selector to choose a pair of individuals from |population|.<br/>
+     * Respects the allow_same_parent_couples_ flag to enable/disable choosing the same individual for both parents.
+     * @see SetAllowSameParentCouples
+     * @see SelectOne
+     */
     std::pair<const Individual&, const Individual&> SelectParents(const Population& population);
 
     /**
@@ -515,8 +531,12 @@ protected:
 private:
 static constexpr double DefaultMutationRate = 0.0005;
 static constexpr double DefaultCrossoverRate = 0.9;
+static constexpr double DefaultMutatedEliteMutationRate = 0.33;
 static constexpr double DefaultSelfAdaptiveMutationDiversityFloor = 0.0002;
 static constexpr double DefaultSelfAdaptiveMutationAggressiveRate = 0.1;
+static constexpr size_t DefaultTournamentSize = 2;
+static constexpr size_t DefaultKPointCrossoverCount = 3;
+static constexpr size_t DefaultProportionalMutationBitCount = 1;
 
     Genome genome_;
     std::vector<Population> populations_;
@@ -534,13 +554,13 @@ static constexpr double DefaultSelfAdaptiveMutationAggressiveRate = 0.1;
 
     double mutation_rate_ = DefaultMutationRate;
     double crossover_rate_ = DefaultCrossoverRate;
-    double mutated_elite_mutation_rate_ = 0.0;
+    double mutated_elite_mutation_rate_ = DefaultMutatedEliteMutationRate;
 
-    size_t tournament_size_ = 2;
-    size_t k_point_crossover_point_count_ = 3;
+    size_t tournament_size_ = DefaultTournamentSize;
+    size_t k_point_crossover_point_count_ = DefaultKPointCrossoverCount;
     double self_adaptive_mutation_diversity_floor_ = DefaultSelfAdaptiveMutationDiversityFloor;
     double self_adaptive_mutation_aggressive_rate_ = DefaultSelfAdaptiveMutationAggressiveRate;
-    size_t proportional_mutation_bit_count_ = 1;
+    size_t proportional_mutation_bit_count_ = DefaultProportionalMutationBitCount;
 
     CrossoverType crossover_type_ = CrossoverType::Uniform;
     MutatorType mutator_type_ = MutatorType::Flip;

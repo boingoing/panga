@@ -134,6 +134,9 @@ public:
      */
     const Individual& RankSelect() const;
 
+    /**
+     * Use |fitness_function| to score each Individual in the population and then sort the population in terms of decreasing fitness.
+     */
     void Evaluate(FitnessFunction fitness_function, void* user_data);
 
 private:

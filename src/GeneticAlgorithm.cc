@@ -358,7 +358,6 @@ void GeneticAlgorithm::Mutate(Individual* individual, double mutation_percentage
         break;
     default:
         assert(false);
-        break;
     }
 }
 
@@ -370,8 +369,6 @@ void GeneticAlgorithm::InitializeSelector(Population* population) {
 
 const Individual& GeneticAlgorithm::SelectOne(const Population& population) {
     switch (selector_type_) {
-    case SelectorType::Rank:
-        return population.RankSelect();
     case SelectorType::Uniform:
         return population.UniformSelect(&random_);
     case SelectorType::RouletteWheel:
@@ -380,7 +377,8 @@ const Individual& GeneticAlgorithm::SelectOne(const Population& population) {
         return population.TournamentSelect(tournament_size_, &random_);
     default:
         assert(false);
-        // If asserts are turned off, we'll throw unless we return something here so blindly return the rank selector value.
+        // If asserts are turned off, this will fail to build unless we return something here so blindly fall-thru into the rank selector case.
+    case SelectorType::Rank:
         return population.RankSelect();
     }
 }
