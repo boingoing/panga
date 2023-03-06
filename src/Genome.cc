@@ -9,7 +9,7 @@
 
 namespace {
 
-constexpr size_t BitsPerByte = 8U;
+constexpr size_t BitsPerByte = CHAR_BIT;
 
 }  // namespace
 

@@ -108,8 +108,8 @@ public:
 
 private:
     std::vector<Gene> genes_;
-    size_t first_boolean_gene_bit_index_;
-    size_t boolean_gene_count_;
+    size_t first_boolean_gene_bit_index_ = 0;
+    size_t boolean_gene_count_ = 0;
 };
 
 }  // namespace panga
