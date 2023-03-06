@@ -1,48 +1,47 @@
 //-------------------------------------------------------------------------------------------------------
 // Copyright (C) Taylor Woll and panga contributors. All rights reserved.
-// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for
+// full license information.
 //-------------------------------------------------------------------------------------------------------
+
+#include "Individual.h"
 
 #include <algorithm>
 #include <cassert>
 
-#include "Individual.h"
 #include "Genome.h"
 
-using namespace panga;
+namespace panga {
 
-Individual::Individual(const Genome* genome, const BitVector* chromosome) :
-    Chromosome(genome),
-    _fitness(0.0),
-    _score(0.0) {
-    if (chromosome != nullptr) {
-        // Chromosome source vector must have the same number of bits as our genome.
-        assert(chromosome->GetBitCount() == genome->BitsRequired());
+Individual::Individual(const Genome& genome) : Chromosome(genome) {}
 
-        // Copy bits from existing chromosome.
-        BitVector::operator=(*chromosome);
-    }
+Individual::Individual(const Genome& genome, const BitVector& chromosome)
+    : Chromosome(genome) {
+  // Chromosome source vector must have the same number of bits as our genome.
+  assert(chromosome.GetBitCount() == genome.BitsRequired());
+  // Copy bits from existing chromosome.
+  BitVector::operator=(chromosome);
 }
 
-Individual::~Individual() {
+Individual& Individual::operator=(const Individual& rhs) {
+  if (this != &rhs) {
+    score_ = rhs.score_;
+    fitness_ = rhs.fitness_;
+    BitVector::operator=(rhs);
+  }
+  return *this;
 }
 
 bool Individual::operator<(const Individual& rhs) const {
-    return this->_score < rhs._score;
+  return score_ < rhs.score_;
 }
 
-double Individual::GetFitness() const {
-    return this->_fitness;
-}
+double Individual::GetFitness() const { return fitness_; }
 
-double Individual::GetScore() const {
-    return this->_score;
-}
+double Individual::GetScore() const { return score_; }
 
-void Individual::SetFitness(double fitness) {
-    this->_fitness = fitness;
-}
+void Individual::SetFitness(double fitness) { fitness_ = fitness; }
 
-void Individual::SetScore(double score) {
-    this->_score = score;
-}
+void Individual::SetScore(double score) { score_ = score; }
+
+}  // namespace panga

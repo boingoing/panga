@@ -1,522 +1,441 @@
 //-------------------------------------------------------------------------------------------------------
 // Copyright (C) Taylor Woll and panga contributors. All rights reserved.
-// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for
+// full license information.
 //-------------------------------------------------------------------------------------------------------
 
-#include <utility>
+#include "GeneticAlgorithm.h"
+
 #include <algorithm>
 #include <numeric>
+#include <utility>
 
-#include "GeneticAlgorithm.h"
 #include "Individual.h"
 
-using namespace panga;
+namespace panga {
 
-GeneticAlgorithm::GeneticAlgorithm() :
-    _genome(nullptr),
-    _mutationRateSchedule(MutationRateSchedule::Constant),
-    _populationSize(0),
-    _totalGenerations(0),
-    _currentGeneration(0),
-    _eliteCount(0),
-    _mutatedEliteCount(0),
-    _mutationRate(0.05),
-    _crossoverRate(0.9),
-    _mutatedEliteMutationRate(0.0),
-    _crossoverType(CrossoverType::Uniform),
-    _mutatorType(MutatorType::Flip),
-    _selectorType(SelectorType::Tournament),
-    _tournamentSize(2),
-    _kPointCrossoverPointCount(3),
-    _selfAdaptiveMutationDiversityFloor(0.0002),
-    _selfAdaptiveMutationAggressiveRate(0.1),
-    _proportionalMutationBitCount(1),
-    _crossoverIgnoreGeneBoundaries(true),
-    _allowSameParentCouples(true),
-    _userData(nullptr),
-    _fitnessFunction(nullptr) {
+GeneticAlgorithm::GeneticAlgorithm() {
+  populations_.emplace_back(genome_);
+  populations_.emplace_back(genome_);
 }
 
-GeneticAlgorithm::~GeneticAlgorithm() {
-    DeletePopulation(&this->_population);
-    DeletePopulation(&this->_lastGenerationPopulation);
-}
+Genome& GeneticAlgorithm::GetGenome() { return genome_; }
 
-void GeneticAlgorithm::SetGenome(const Genome* genome) {
-    this->_genome = genome;
-}
-
-const Genome* GeneticAlgorithm::GetGenome() const {
-    return this->_genome;
-}
-
-void GeneticAlgorithm::SetMutatedEliteMutationRate(double mutatedEliteMutationRate) {
-    this->_mutatedEliteMutationRate = mutatedEliteMutationRate;
+void GeneticAlgorithm::SetMutatedEliteMutationRate(
+    double mutated_elite_mutation_rate) {
+  mutated_elite_mutation_rate_ = mutated_elite_mutation_rate;
 }
 
 double GeneticAlgorithm::GetMutatedEliteMutationRate() const {
-    return this->_mutatedEliteMutationRate;
+  return mutated_elite_mutation_rate_;
 }
 
-void GeneticAlgorithm::SetMutationRate(double mutationRate) {
-    this->_mutationRate = mutationRate;
+void GeneticAlgorithm::SetMutationRate(double mutation_rate) {
+  mutation_rate_ = mutation_rate;
 }
 
-double GeneticAlgorithm::GetMutationRate() const {
-    return this->_mutationRate;
+double GeneticAlgorithm::GetMutationRate() const { return mutation_rate_; }
+
+void GeneticAlgorithm::SetCrossoverRate(double crossover_rate) {
+  crossover_rate_ = crossover_rate;
 }
 
-void GeneticAlgorithm::SetCrossoverRate(double crossoverRate) {
-    this->_crossoverRate = crossoverRate;
+double GeneticAlgorithm::GetCrossoverRate() const { return crossover_rate_; }
+
+void GeneticAlgorithm::SetPopulationSize(size_t population_size) {
+  population_size_ = population_size;
 }
 
-double GeneticAlgorithm::GetCrossoverRate() const {
-    return this->_crossoverRate;
-}
+size_t GeneticAlgorithm::GetPopulationSize() const { return population_size_; }
 
-void GeneticAlgorithm::SetPopulationSize(size_t populationSize) {
-    this->_populationSize = populationSize;
-}
-
-size_t GeneticAlgorithm::GetPopulationSize() const {
-    return this->_populationSize;
-}
-
-void GeneticAlgorithm::SetTotalGenerations(size_t totalGenerations) {
-    this->_totalGenerations = totalGenerations;
+void GeneticAlgorithm::SetTotalGenerations(size_t total_generations) {
+  total_generations_ = total_generations;
 }
 
 size_t GeneticAlgorithm::GetTotalGenerations() const {
-    return this->_totalGenerations;
+  return total_generations_;
 }
 
-void GeneticAlgorithm::SetFitnessFunction(FitnessFunction fitnessFunction) {
-    this->_fitnessFunction = fitnessFunction;
+void GeneticAlgorithm::SetFitnessFunction(FitnessFunction fitness_function) {
+  fitness_function_ = fitness_function;
 }
 
-GeneticAlgorithm::FitnessFunction GeneticAlgorithm::GetFitnessFunction() const {
-    return this->_fitnessFunction;
+FitnessFunction GeneticAlgorithm::GetFitnessFunction() const {
+  return fitness_function_;
 }
 
-size_t GeneticAlgorithm::GetEliteCount() const {
-    return this->_eliteCount;
-}
+size_t GeneticAlgorithm::GetEliteCount() const { return elite_count_; }
 
-void GeneticAlgorithm::SetEliteCount(size_t eliteCount) {
-    this->_eliteCount = eliteCount;
+void GeneticAlgorithm::SetEliteCount(size_t elite_count) {
+  elite_count_ = elite_count;
 }
 
 size_t GeneticAlgorithm::GetMutatedEliteCount() const {
-    return this->_mutatedEliteCount;
+  return mutated_elite_count_;
 }
 
-void GeneticAlgorithm::SetMutatedEliteCount(size_t mutatedEliteCount) {
-    this->_mutatedEliteCount = mutatedEliteCount;
+void GeneticAlgorithm::SetMutatedEliteCount(size_t mutated_elite_count) {
+  mutated_elite_count_ = mutated_elite_count;
 }
 
-void GeneticAlgorithm::SetMutationRateSchedule(MutationRateSchedule mutationRateSchedule) {
-    this->_mutationRateSchedule = mutationRateSchedule;
+void GeneticAlgorithm::SetMutationRateSchedule(
+    MutationRateSchedule mutation_rate_schedule) {
+  mutation_rate_schedule_ = mutation_rate_schedule;
 }
 
-GeneticAlgorithm::MutationRateSchedule GeneticAlgorithm::GetMutationRateSchedule() const {
-    return this->_mutationRateSchedule;
+GeneticAlgorithm::MutationRateSchedule
+GeneticAlgorithm::GetMutationRateSchedule() const {
+  return mutation_rate_schedule_;
 }
 
-void GeneticAlgorithm::SetUserData(void* userData) {
-    this->_userData = userData;
-}
+void GeneticAlgorithm::SetUserData(void* user_data) { user_data_ = user_data; }
 
-void* GeneticAlgorithm::GetUserData() const {
-    return this->_userData;
-}
+void* GeneticAlgorithm::GetUserData() const { return user_data_; }
 
-void GeneticAlgorithm::SetCrossoverType(CrossoverType crossoverType) {
-    this->_crossoverType = crossoverType;
+void GeneticAlgorithm::SetCrossoverType(CrossoverType crossover_type) {
+  crossover_type_ = crossover_type;
 }
 
 GeneticAlgorithm::CrossoverType GeneticAlgorithm::GetCrossoverType() const {
-    return this->_crossoverType;
+  return crossover_type_;
 }
 
-void GeneticAlgorithm::SetMutatorType(MutatorType mutatorType) {
-    this->_mutatorType = mutatorType;
+void GeneticAlgorithm::SetMutatorType(MutatorType mutator_type) {
+  mutator_type_ = mutator_type;
 }
 
 GeneticAlgorithm::MutatorType GeneticAlgorithm::GetMutatorType() const {
-    return this->_mutatorType;
+  return mutator_type_;
 }
 
-void GeneticAlgorithm::SetSelectorType(SelectorType selectorType) {
-    this->_selectorType = selectorType;
+void GeneticAlgorithm::SetSelectorType(SelectorType selector_type) {
+  selector_type_ = selector_type;
 }
 
 GeneticAlgorithm::SelectorType GeneticAlgorithm::GetSelectorType() const {
-    return this->_selectorType;
+  return selector_type_;
 }
 
-void GeneticAlgorithm::SetCrossoverIgnoreGeneBoundaries(bool crossoverIgnoreGeneBoundaries) {
-    this->_crossoverIgnoreGeneBoundaries = crossoverIgnoreGeneBoundaries;
+void GeneticAlgorithm::SetCrossoverIgnoreGeneBoundaries(
+    bool crossover_ignore_gene_boundaries) {
+  crossover_ignore_gene_boundaries_ = crossover_ignore_gene_boundaries;
 }
 
 bool GeneticAlgorithm::GetCrossoverIgnoreGeneBoundaries() const {
-    return this->_crossoverIgnoreGeneBoundaries;
+  return crossover_ignore_gene_boundaries_;
 }
 
-void GeneticAlgorithm::SetAllowSameParentCouples(bool allowSameParentCouples) {
-    this->_allowSameParentCouples = allowSameParentCouples;
+void GeneticAlgorithm::SetAllowSameParentCouples(
+    bool allow_same_parent_couples) {
+  allow_same_parent_couples_ = allow_same_parent_couples;
 }
 
 bool GeneticAlgorithm::GetAllowSameParentCouples() const {
-    return this->_allowSameParentCouples;
+  return allow_same_parent_couples_;
 }
 
 size_t GeneticAlgorithm::GetCurrentGeneration() const {
-    return this->_currentGeneration;
+  return current_generation_;
 }
 
-void GeneticAlgorithm::SetTournamentSize(size_t tournamentSize) {
-    this->_tournamentSize = tournamentSize;
+void GeneticAlgorithm::SetTournamentSize(size_t tournament_size) {
+  tournament_size_ = tournament_size;
 }
 
-size_t GeneticAlgorithm::GetTournamentSize() const {
-    return this->_tournamentSize;
-}
+size_t GeneticAlgorithm::GetTournamentSize() const { return tournament_size_; }
 
-void GeneticAlgorithm::SetKPointCrossoverPointCount(size_t kPointCrossoverPointCount) {
-    this->_kPointCrossoverPointCount = kPointCrossoverPointCount;
+void GeneticAlgorithm::SetKPointCrossoverPointCount(
+    size_t k_point_crossover_point_count) {
+  k_point_crossover_point_count_ = k_point_crossover_point_count;
 }
 
 size_t GeneticAlgorithm::GetKPointCrossoverPointCount() const {
-    return this->_kPointCrossoverPointCount;
+  return k_point_crossover_point_count_;
 }
 
-void GeneticAlgorithm::SetSelfAdaptiveMutationDiversityFloor(double selfAdaptiveMutationDiversityFloor) {
-    this->_selfAdaptiveMutationDiversityFloor = selfAdaptiveMutationDiversityFloor;
+void GeneticAlgorithm::SetSelfAdaptiveMutationDiversityFloor(
+    double self_adaptive_mutation_diversity_floor) {
+  self_adaptive_mutation_diversity_floor_ =
+      self_adaptive_mutation_diversity_floor;
 }
 
 double GeneticAlgorithm::GetSelfAdaptiveMutationDiversityFloor() const {
-    return this->_selfAdaptiveMutationDiversityFloor;
+  return self_adaptive_mutation_diversity_floor_;
 }
 
-void GeneticAlgorithm::SetSelfAdaptiveMutationAggressiveRate(double selfAdaptiveMutationAggressiveRate) {
-    this->_selfAdaptiveMutationAggressiveRate = selfAdaptiveMutationAggressiveRate;
+void GeneticAlgorithm::SetSelfAdaptiveMutationAggressiveRate(
+    double self_adaptive_mutation_aggressive_rate) {
+  self_adaptive_mutation_aggressive_rate_ =
+      self_adaptive_mutation_aggressive_rate;
 }
 
 double GeneticAlgorithm::GetSelfAdaptiveMutationAggressiveRate() const {
-    return this->_selfAdaptiveMutationAggressiveRate;
+  return self_adaptive_mutation_aggressive_rate_;
 }
 
-void GeneticAlgorithm::SetProportionalMutationBitCount(size_t proportionalMutationBitCount) {
-    this->_proportionalMutationBitCount = proportionalMutationBitCount;
+void GeneticAlgorithm::SetProportionalMutationBitCount(
+    size_t proportional_mutation_bit_count) {
+  proportional_mutation_bit_count_ = proportional_mutation_bit_count;
 }
 
 size_t GeneticAlgorithm::GetProportionalMutationBitCount() const {
-    return this->_proportionalMutationBitCount;
+  return proportional_mutation_bit_count_;
 }
 
-Individual* GeneticAlgorithm::GetBestIndividual() const {
-    if (this->_lastGenerationPopulation.empty()) {
-        return nullptr;
-    }
-
-    return this->_lastGenerationPopulation.front();
+void GeneticAlgorithm::SetInitialPopulation(
+    const std::vector<BitVector>& initial_population) {
+  // TODO(boingoing): This doesn't support setting an initial population after
+  // the genetic algorithm has begun, we should add some kind of reset
+  // mechanism?
+  auto& population = GetCurrentPopulation();
+  population.Initialize(initial_population);
 }
 
-Individual* GeneticAlgorithm::GetIndividual(size_t index) const {
-    assert(index < this->_lastGenerationPopulation.size());
+void GeneticAlgorithm::Initialize() {
+  // Reset the current generation.
+  current_generation_ = 0;
 
-    return this->_lastGenerationPopulation[index];
+  // If the population isn't full, this will fill it up with random individuals.
+  auto& population = GetCurrentPopulation();
+  population.Resize(population_size_, &random_);
+
+  // The last generation population needs to have the same number of individuals
+  // in it but all random ones will do.
+  auto& last_generation_population = GetLastGenerationPopulation();
+  last_generation_population.Resize(population_size_, &random_);
+
+  // Reset the flag to track if we have already evaluated the initial
+  // population.
+  is_initial_population_evaluated_ = false;
 }
 
-double GeneticAlgorithm::GetMinimumScore() const {
-    assert(!this->_lastGenerationPopulation.empty());
-
-    return this->_lastGenerationPopulation.front()->GetScore();
+Population& GeneticAlgorithm::GetCurrentPopulation() {
+  // Even generations should use the 0th population as current.
+  // Odd generations should use the 1st population as current.
+  const size_t current_population_index = current_generation_ % 2U;
+  return populations_[current_population_index];
 }
 
-double GeneticAlgorithm::GetAverageScore() const {
-    if (this->_lastGenerationPopulation.empty()) {
-        return 0.0;
-    }
-
-    double sum = 0.0;
-    std::for_each(this->_lastGenerationPopulation.begin(), this->_lastGenerationPopulation.end(), [&] (const Individual* i) {
-        sum += i->GetScore();
-    });
-    return sum / this->_lastGenerationPopulation.size();
+Population& GeneticAlgorithm::GetLastGenerationPopulation() {
+  // Even generations should use the 1st population as previous.
+  // Odd generations should use the 0th population as previous.
+  const size_t previous_population_index = (current_generation_ + 1U) % 2U;
+  return populations_[previous_population_index];
 }
 
-double GeneticAlgorithm::GetScoreStandardDeviation() const {
-    if (this->_lastGenerationPopulation.size() <= 1) {
-        return 0.0;
-    }
-
-    double mean = this->GetAverageScore();
-    double sum = 0.0;
-    std::for_each(this->_lastGenerationPopulation.begin(), this->_lastGenerationPopulation.end(), [&](const Individual* i) {
-        double score = i->GetScore();
-        sum += (score - mean) * (score - mean);
-    });
-    return std::sqrt(sum / (this->_lastGenerationPopulation.size() - 1));
-}
-
-double GeneticAlgorithm::GetPopulationDiversity() const {
-    assert(this->_lastGenerationPopulation.size() == this->_populationSize);
-
-    size_t distance = 0;
-
-    for (size_t i = 0; i < this->_populationSize; i++) {
-        for (size_t j = i + 1; j < this->_populationSize; j++) {
-            distance += this->_lastGenerationPopulation.at(i)->HammingDistance(this->_lastGenerationPopulation.at(j));
-        }
-    }
-
-    return ((double)distance) / ((double)this->_genome->BitsRequired() * ((double)((this->_populationSize*(this->_populationSize - 1)) >> 2)));
-}
-
-void GeneticAlgorithm::DeletePopulation(Population* population) {
-    std::for_each(population->begin(), population->end(), [](Individual* i) {
-        delete i;
-    });
-    population->clear();
-}
-
-void GeneticAlgorithm::Initialize(const std::vector<const BitVector*>* initialPopulation) {
-    assert(this->_genome != nullptr);
-
-    // Delete any existing population members.
-    DeletePopulation(&this->_population);
-    DeletePopulation(&this->_lastGenerationPopulation);
-
-    // Create new population members based on the initialPopulation.
-    if (initialPopulation != nullptr) {
-        for (std::vector<const BitVector*>::const_iterator it = initialPopulation->begin(); it != initialPopulation->end(); ++it) {
-            if (this->_population.size() < this->_populationSize) {
-                this->_population.push_back(new Individual(this->_genome, *it));
-            }
-        }
-    }
-
-    // Fill out the rest of the population with random individuals.
-    while (this->_population.size() < this->_populationSize) {
-        Individual* i = new Individual(this->_genome);
-        i->Randomize(&this->_randomWrapper);
-        this->_population.push_back(i);
-    }
-
-    // We need objects to exist in the last generation, though they won't be
-    // used until we perform the next step.
-    while (this->_lastGenerationPopulation.size() < this->_populationSize) {
-        this->_lastGenerationPopulation.push_back(new Individual(this->_genome));
-    }
-
-    // Reset the current generation.
-    this->_currentGeneration = 0;
+const Population& GeneticAlgorithm::GetPopulation() const {
+  // Even generations should use the 0th population as current.
+  // Odd generations should use the 1st population as current.
+  const size_t current_population_index = current_generation_ % 2U;
+  return populations_[current_population_index];
 }
 
 void GeneticAlgorithm::Step() {
-    assert(this->_population.size() == this->_lastGenerationPopulation.size());
-
-    // We are about to score the current population.
-    this->_currentGeneration++;
-
-    // Score and sort the current population.
-    // This population is either the result of Initialize() or a previous
-    // Step() operation.
-    this->Evaluate(&this->_population);
-
-    // Get the mutation rate for the current generation.
-    double currentMutationRate = this->GetCurrentMutationRate();
-
-    // Save current population into last generation population.
-    this->_population.swap(this->_lastGenerationPopulation);
-
-    // Initialize the selector.
-    this->InitializeSelector(&this->_lastGenerationPopulation);
-    auto parents = std::make_pair<Individual*, Individual*>(nullptr, nullptr);
-
-    size_t currentNewIndividual = 0;
+  // If we're on any generation other than the 0th one, we need to build the
+  // current population based on the previous generation.
+  if (is_initial_population_evaluated_) {
+    current_generation_++;
+    auto& current_population = GetCurrentPopulation();
+    auto& last_generation_population = GetLastGenerationPopulation();
 
     // Elitism
-    // Add the best individuals from last generation into the current population.
-    for (size_t i = 0; i < this->_eliteCount; i++) {
-        *this->_population[currentNewIndividual++] = *this->_lastGenerationPopulation[i];
+    // Add the best individuals from last generation into the current
+    // population. Note: last_generation_population must already be sorted with
+    // best individuals at the front.
+    for (size_t i = 0; i < elite_count_; i++) {
+      // Overwrite the first i members of population with those from last
+      // generation.
+      const auto& elite = last_generation_population.GetIndividual(i);
+      current_population.Replace(i, elite);
     }
 
     // Mutated elitism
-    // Take the best individuals from the last generation but mutate them by a variable rate.
-    for (size_t i = 0; i < this->_mutatedEliteCount; i++) {
-        Individual* newIndividual = this->_population[currentNewIndividual++];
-        *newIndividual = *this->_lastGenerationPopulation[i];
-        this->Mutate(newIndividual, this->_mutatedEliteMutationRate);
+    // Take the best individuals from the last generation but mutate them by a
+    // variable rate.
+    for (size_t i = 0; i < mutated_elite_count_; i++) {
+      const auto& elite = last_generation_population.GetIndividual(i);
+      const size_t index = elite_count_ + i;
+      current_population.Replace(index, elite);
+      auto& mutated_elite = current_population.GetIndividualWritable(index);
+      Mutate(&mutated_elite, mutated_elite_mutation_rate_);
     }
 
+    // Get the mutation rate for the current generation.
+    // Note: This can depend on the previous population already having been
+    // evaluated.
+    const double current_mutation_rate = GetCurrentMutationRate();
+    // We already added elite_count_ + mutated_elite_count_ individuals based on
+    // the last generation.
+    size_t current_population_size = elite_count_ + mutated_elite_count_;
+    // Initialize the selector.
+    InitializeSelector(&last_generation_population);
     // Create offspring from individuals in last generation.
-    while (currentNewIndividual < this->_populationSize) {
-        Individual* offspring = this->_population[currentNewIndividual++];
+    while (current_population_size < population_size_) {
+      auto& offspring =
+          current_population.GetIndividualWritable(current_population_size++);
 
-        // Select a couple from the last generation.
-        this->SelectParents(&this->_lastGenerationPopulation, &parents);
+      // Select a couple from the last generation.
+      const auto parents = SelectParents(last_generation_population);
 
-        // See if we will do crossover or duplicate a parent.
-        if (this->_randomWrapper.CoinFlip(this->_crossoverRate)) {
-            this->Crossover(parents.first, parents.second, offspring);
-        } else {
-            *offspring = *parents.first;
-        }
+      // See if we will do crossover or duplicate a parent.
+      if (random_.CoinFlip(crossover_rate_)) {
+        Crossover(parents.first, parents.second, &offspring);
+      } else {
+        // TODO(boingoing): Should we flip an even coin here to decide which
+        // parent to duplicate?
+        offspring = parents.first;
+      }
 
-        // Mutate offspring.
-        this->Mutate(offspring, currentMutationRate);
+      // Mutate offspring.
+      Mutate(&offspring, current_mutation_rate);
     }
-}
+  }
 
-void GeneticAlgorithm::Score(Individual* individual) {
-    individual->SetScore(this->_fitnessFunction(individual, this->_userData));
-}
+  // Score and sort the current population.
+  // This population is either the result of Initialize() or a Step() operation.
+  auto& current_population = GetCurrentPopulation();
+  current_population.Evaluate(fitness_function_, user_data_);
 
-void GeneticAlgorithm::Evaluate(Population* population) {
-    // Score current population.
-    std::for_each(population->begin(), population->end(), [&](Individual* i) {
-        this->Score(i);
-    });
-
-    // Sort the population by increasing raw score.
-    std::sort(population->begin(), population->end(),
-        [](Individual* const& a, Individual* const& b) { return *a < *b; });
-
-    // Calculate the Individual fitness scores.
-    double scoreSum = 0.0;
-    double bestScore = population->front()->GetScore();
-    double worstScore = population->back()->GetScore();
-
-    // We need to invert the trend of scores.
-    // First, calculate best+worst - score[i] as an intermediate score.
-    std::for_each(population->begin(), population->end(), [&](Individual* i) {
-        double tempScore = bestScore + worstScore - i->GetScore();
-        scoreSum += tempScore;
-        i->SetFitness(tempScore);
-    });
-
-    // Now calculate fitness as a proportion of the intermediate sum.
-    std::for_each(population->begin(), population->end(), [&](Individual* i) {
-        i->SetFitness(i->GetFitness() / scoreSum);
-    });
+  if (current_generation_ == 0) {
+    is_initial_population_evaluated_ = true;
+  }
 }
 
 void GeneticAlgorithm::Run() {
-    while (this->_currentGeneration < this->_totalGenerations) {
-        this->Step();
-    }
+  while (current_generation_ < total_generations_) {
+    Step();
+  }
 }
 
 double GeneticAlgorithm::GetCurrentMutationRate() {
-    switch (this->_mutationRateSchedule) {
+  switch (mutation_rate_schedule_) {
     case MutationRateSchedule::Constant:
-        return this->_mutationRate;
-    case MutationRateSchedule::Deterministic:
-    {
-        // If total generations is 0 or if we are on a generation after the total counter,
-        // deterministic calculation would return 0 for mutation rate.
-        // In that case just use the constant-schedule mutation rate instead.
-        return this->_totalGenerations == 0 || this->_currentGeneration > this->_totalGenerations ?
-            this->_mutationRate :
-            1.0 / (2.0 + ((this->_genome->BitsRequired() - 2.0) / (this->_totalGenerations - 1.0)) * this->_currentGeneration);
+      return mutation_rate_;
+    case MutationRateSchedule::Deterministic: {
+      // If total generations is 0 or if we are on a generation after the total
+      // counter, deterministic calculation would return 0 for mutation rate. In
+      // that case just use the constant-schedule mutation rate instead.
+      if (total_generations_ == 0 || current_generation_ > total_generations_) {
+        return mutation_rate_;
+      }
+
+      // The deterministic schedule starts very aggressively using the mutation
+      // operator to search the error surface. The first generation we build
+      // (this will be the one built out of the evaluated 0th generation) will
+      // be mutated at a rate of about 0.5 - half! After that, the rate drops
+      // based on the current generation.
+      const auto bits_per_generation =
+          static_cast<double>(genome_.BitsRequired()) / total_generations_;
+      return 1.0 / (bits_per_generation * (current_generation_ - 1U) + 2U);
     }
-    case MutationRateSchedule::SelfAdaptive:
-        if (this->GetPopulationDiversity() < this->_selfAdaptiveMutationDiversityFloor) {
-            return this->_selfAdaptiveMutationAggressiveRate;
-        } else {
-            return this->_mutationRate;
-        }
+    case MutationRateSchedule::SelfAdaptive: {
+      const auto& last_generation_population = GetLastGenerationPopulation();
+      if (last_generation_population.GetPopulationDiversity() <
+          self_adaptive_mutation_diversity_floor_) {
+        return self_adaptive_mutation_aggressive_rate_;
+      }
+      return mutation_rate_;
+    }
     case MutationRateSchedule::Proportional:
-        // Proportional schedule sets a mutation probability in order to flip _proportionalMutationBitCount bits.
-        assert(this->_genome->BitsRequired() != 0);
-        return this->_proportionalMutationBitCount * (1.0 / this->_genome->BitsRequired());
+      // Proportional schedule sets a mutation probability in order to flip
+      // proportional_mutation_bit_count_ bits in the genome.
+      assert(genome_.BitsRequired() != 0);
+      return proportional_mutation_bit_count_ * (1.0 / genome_.BitsRequired());
     default:
-        // Invalid mutation rate schedule
-        assert(false);
-        return 0.0;
-    }
+      // Invalid mutation rate schedule
+      assert(false);
+      return 0.0;
+  }
 }
 
-template <bool ignoreGeneBoundaries>
-void GeneticAlgorithm::CrossoverInternal(Individual* parent1, Individual* parent2, Individual* offspring) {
-    switch (this->_crossoverType) {
+void GeneticAlgorithm::Crossover(const Individual& parent1,
+                                 const Individual& parent2,
+                                 Individual* offspring) {
+  switch (crossover_type_) {
     case CrossoverType::OnePoint:
-        Chromosome::KPointCrossover<ignoreGeneBoundaries>(1, parent1, parent2, offspring, &this->_randomWrapper);
-        break;
+      Chromosome::KPointCrossover(1, parent1, parent2, offspring, &random_,
+                                  crossover_ignore_gene_boundaries_);
+      break;
     case CrossoverType::TwoPoint:
-        Chromosome::KPointCrossover<ignoreGeneBoundaries>(2, parent1, parent2, offspring, &this->_randomWrapper);
-        break;
+      Chromosome::KPointCrossover(2, parent1, parent2, offspring, &random_,
+                                  crossover_ignore_gene_boundaries_);
+      break;
     case CrossoverType::KPoint:
-        Chromosome::KPointCrossover<ignoreGeneBoundaries>(this->_kPointCrossoverPointCount, parent1, parent2, offspring, &this->_randomWrapper);
-        break;
+      Chromosome::KPointCrossover(k_point_crossover_point_count_, parent1,
+                                  parent2, offspring, &random_,
+                                  crossover_ignore_gene_boundaries_);
+      break;
     case CrossoverType::Uniform:
-        Chromosome::UniformCrossover<ignoreGeneBoundaries>(parent1, parent2, offspring, &this->_randomWrapper);
-        break;
+      Chromosome::UniformCrossover(parent1, parent2, offspring, &random_,
+                                   crossover_ignore_gene_boundaries_);
+      break;
     default:
-        assert(false);
-    }
+      assert(false);
+  }
 }
 
-void GeneticAlgorithm::Crossover(Individual* parent1, Individual* parent2, Individual* offspring) {
-    assert(parent1->GetBitCount() == parent2->GetBitCount());
-
-    if (this->_crossoverIgnoreGeneBoundaries) {
-        this->CrossoverInternal<true>(parent1, parent2, offspring);
-    } else {
-        this->CrossoverInternal<false>(parent1, parent2, offspring);
-    }
-}
-
-void GeneticAlgorithm::Mutate(Individual* individual, double mutationPercentage) {
-    switch (this->_mutatorType) {
+void GeneticAlgorithm::Mutate(Individual* individual,
+                              double mutation_percentage) {
+  switch (mutator_type_) {
     case MutatorType::Flip:
-        Chromosome::FlipMutator(individual, mutationPercentage, &this->_randomWrapper);
-        break;
+      Chromosome::FlipMutator(individual, mutation_percentage, &random_);
+      break;
     default:
-        assert(false);
-        break;
-    }
+      assert(false);
+  }
 }
 
 void GeneticAlgorithm::InitializeSelector(Population* population) {
-    if (this->_selectorType == SelectorType::RouletteWheel) {
-        population->InitializePartialSums();
-    }
+  if (selector_type_ == SelectorType::RouletteWheel) {
+    population->InitializePartialSums();
+  }
 }
 
-Individual* GeneticAlgorithm::SelectOne(Population* population) {
-    switch (this->_selectorType) {
-    case SelectorType::Rank:
-        return population->RankSelect();
+const Individual& GeneticAlgorithm::SelectOne(const Population& population) {
+  switch (selector_type_) {
     case SelectorType::Uniform:
-        return population->UniformSelect(&this->_randomWrapper);
+      return population.UniformSelect(&random_);
     case SelectorType::RouletteWheel:
-        return population->RouletteWheelSelect(&this->_randomWrapper);
+      return population.RouletteWheelSelect(&random_);
     case SelectorType::Tournament:
-        return population->TournamentSelect(this->_tournamentSize, &this->_randomWrapper);
+      return population.TournamentSelect(tournament_size_, &random_);
     default:
-        assert(false);
-        return nullptr;
-    }
+      assert(false);
+      // If asserts are turned off, this will fail to build unless we return
+      // something here so blindly fall-thru into the rank selector case.
+      [[fallthrough]];
+    case SelectorType::Rank:
+      return population.RankSelect();
+  }
 }
 
-void GeneticAlgorithm::SelectParents(Population* population, std::pair<Individual*, Individual*>* parents) {
-    assert(population->size() > 0);
+std::pair<const Individual&, const Individual&> GeneticAlgorithm::SelectParents(
+    const Population& population) {
+  assert(population.Size() > 0);
 
-    parents->first = this->SelectOne(population);
+  const auto& first = SelectOne(population);
 
-    if (this->_allowSameParentCouples) {
-        parents->second = this->SelectOne(population);
-    } else {
-        Population temp;
-        std::for_each(population->begin(), population->end(), [&](Individual* i) {
-            if (i != parents->first) {
-                temp.push_back(i);
-            }
-        });
-        this->InitializeSelector(&temp);
-        parents->second = this->SelectOne(&temp);
+  // If we can select the same parent for each pair element, we can just select
+  // another one and return them.
+  if (allow_same_parent_couples_) {
+    const auto& second = SelectOne(population);
+    return {first, second};
+  }
+
+  // When we want to avoid selecting the same parent for each pair element, do
+  // the simple thing and select from a population which doesn't contain
+  // |first|.
+  Population temp(genome_);
+  temp.Resize(population.Size() - 1U, &random_);
+  for (size_t target_index = 0, i = 0; i < population.Size(); i++) {
+    const auto& individual = population.GetIndividual(i);
+    if (&individual != &first) {
+      temp.Replace(target_index++, individual);
     }
+  }
+  InitializeSelector(&temp);
+  const auto& second = SelectOne(temp);
+  return {first, second};
 }
+
+}  // namespace panga
