@@ -7,6 +7,7 @@
 #define BITVECTOR_H__
 
 #include <cassert>
+#include <climits>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -189,8 +190,7 @@ protected:
      */
     template <typename IntegerType = uint64_t>
     static void WriteInt(std::byte* bytes, size_t start_bit_index, size_t bits_to_copy, IntegerType value) {
-        constexpr size_t bits_per_byte = 8;
-        assert(bits_to_copy <= bits_per_byte * sizeof(IntegerType));
+        assert(bits_to_copy <= CHAR_BIT * sizeof(IntegerType));
         WriteBytes(reinterpret_cast<std::byte*>(&value), 0, bytes, start_bit_index, bits_to_copy);
     }
 
@@ -199,8 +199,7 @@ protected:
      */
     template <typename IntegerType = uint64_t>
     static IntegerType ReadInt(const std::byte* bytes, size_t start_bit_index, size_t bits_to_copy) {
-        constexpr size_t bits_per_byte = 8;
-        assert(bits_to_copy <= bits_per_byte * sizeof(IntegerType));
+        assert(bits_to_copy <= CHAR_BIT * sizeof(IntegerType));
         IntegerType value = 0;
         WriteBytes(bytes, start_bit_index, reinterpret_cast<std::byte*>(&value), 0, bits_to_copy);
         return value;

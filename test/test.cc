@@ -155,6 +155,10 @@ bool TestCrossoverGenes(size_t gene_count, size_t gene_width) {
     // This means we will take all the bits of a gene instead of cutting them up.
     Individual::UniformCrossover(left, right, &offspring, &random, false);
 
+    if (VerboseOutput) {
+        std::cout << "Left: " << left << std::endl << "Right: " << right << std::endl << "Offspring: " << offspring << std::endl;
+    }
+
     for (size_t i = 0; i < gene_count; i++) {
         const auto value = offspring.DecodeIntegerGene<uint64_t, false>(i);
         const auto max_value = std::numeric_limits<uint64_t>::max() >> (sizeof(uint64_t) * CHAR_BIT - gene_width);

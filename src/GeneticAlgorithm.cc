@@ -380,6 +380,8 @@ const Individual& GeneticAlgorithm::SelectOne(const Population& population) {
         return population.TournamentSelect(tournament_size_, &random_);
     default:
         assert(false);
+        // If asserts are turned off, we'll throw unless we return something here so blindly return the rank selector value.
+        return population.RankSelect();
     }
 }
 

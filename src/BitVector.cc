@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <iomanip>
@@ -15,6 +16,9 @@
 namespace {
 
 constexpr size_t BitsPerByte = CHAR_BIT;
+
+// We would like to use std::numeric_limits<std::byte>::max() but that isn't defined for std::byte.
+constexpr std::byte MaxByteValue = std::byte{ UCHAR_MAX };
 
 /**
  * Count the number of bits set in a byte.
@@ -88,12 +92,12 @@ void BitVector::WriteBytes(const std::byte* source, size_t source_start_bit_offs
 
         // Mask off the bits in the destination first byte which we do not want to overwrite and put them back into the destination first byte.
         const size_t destination_first_byte_bit_index = destination_start_bit_offset % BitsPerByte;
-        destination[destination_first_byte_index] |= first_byte & std::numeric_limits<std::byte>::max() >> (BitsPerByte - destination_first_byte_bit_index);
+        destination[destination_first_byte_index] |= first_byte & MaxByteValue >> (BitsPerByte - destination_first_byte_bit_index);
     }
 
     // Now mask off the last byte so we don't lose existing bits there.
     const size_t destination_last_byte_bit_index = (destination_start_bit_offset + bits_to_copy) % BitsPerByte;
-    const std::byte mask = std::numeric_limits<std::byte>::max() << destination_last_byte_bit_index;
+    const std::byte mask = MaxByteValue << destination_last_byte_bit_index;
     destination[destination_last_byte_index] = destination[destination_last_byte_index] & ~mask | last_byte & mask;
 }
 
@@ -106,7 +110,11 @@ bool BitVector::Compare(const std::byte* left, const std::byte* right, size_t bi
         return false;
     }
 
-    const std::byte mask = std::numeric_limits<std::byte>::max() >> (BitsPerByte - bits_remaining);
+    if (bits_remaining == 0) {
+        return true;
+    }
+
+    const std::byte mask = MaxByteValue >> (BitsPerByte - bits_remaining);
     const std::byte result = (left[bytes_to_compare] & mask) ^ (right[bytes_to_compare] & mask);
     return std::byte{0} == result;
 }
@@ -211,10 +219,12 @@ size_t BitVector::HammingDistance(const BitVector& rhs) const {
 
     // Mask the last byte so it only includes bits which are in the vector.
     const size_t relevant_bits = this->bit_count_ % BitsPerByte;
-    const std::byte mask = std::numeric_limits<std::byte>::max() >> (BitsPerByte - relevant_bits);
 
-    distance += CountSetBits((this->bytes_[last_byte] & mask)
-                             ^ (rhs.bytes_[last_byte] & mask));
+    if (relevant_bits > 0) {
+        const std::byte mask = MaxByteValue >> (BitsPerByte - relevant_bits);
+        distance += CountSetBits((this->bytes_[last_byte] & mask)
+            ^ (rhs.bytes_[last_byte] & mask));
+    }
 
     return distance;
 }
@@ -266,16 +276,13 @@ size_t BitVector::ToStringHex(char* buffer, size_t buffer_length) const {
 
         // Mask the last byte.
         const size_t relevant_bits = this->bit_count_ % BitsPerByte;
-        const std::byte mask = std::numeric_limits<std::byte>::max() >> (BitsPerByte - relevant_bits);
-        int bytes_written = 0;
-
-        // snprintf writes 3 bytes into |buffer| but the last one is the null terminator which we will overwrite in the next iteration so we'll ignore it in the bytes_written counter.
-        bytes_written += snprintf(buffer, 3U, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte] & mask)) - 1;
+        const std::byte mask = MaxByteValue >> (BitsPerByte - relevant_bits);
+        int bytes_written = snprintf(buffer, 3U, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte] & mask));
         for (size_t i = 0; i < last_byte; i++) {
-            bytes_written += snprintf(buffer + 2U * (i + 1U), 3U, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte - i - 1U])) - 1;
+            bytes_written += snprintf(buffer + 2U * (i + 1U), 3U, "%02hhx", std::to_integer<uint8_t>(this->bytes_[last_byte - i - 1U]));
         }
 
-        assert(bytes_written + 1U == bytes_needed);
+        assert(bytes_written == bytes_needed);
         assert(buffer[bytes_needed] == '\0');
     }
 
@@ -289,10 +296,10 @@ void BitVector::FromStringHex(const char* buffer, size_t buffer_length) {
     this->SetBitCount(buffer_length / 2U * BitsPerByte);
 
     constexpr int radix = 16;
-    char temp_buffer[2];
+    char temp_buffer[3] = {0,0,0};
     size_t i = 0;
     for (std::byte& b : this->bytes_) {
-        strncpy(temp_buffer, buffer + buffer_length - 2U * i++, 2U);
+        strncpy(temp_buffer, buffer + buffer_length - 2U * ++i, 2U);
         b = static_cast<std::byte>(strtoul(temp_buffer, nullptr, radix));
     }
 }
@@ -311,7 +318,7 @@ void BitVector::WriteToStreamHex(std::ostream& out) const {
     // Mask the last byte.
     const size_t last_byte = this->bit_count_ / BitsPerByte;
     const size_t relevant_bits = this->bit_count_ % BitsPerByte;
-    const std::byte mask = std::numeric_limits<std::byte>::max() >> (BitsPerByte - relevant_bits);
+    const std::byte mask = MaxByteValue >> (BitsPerByte - relevant_bits);
 
     out << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(this->bytes_[last_byte] & mask);
     for (size_t i = 0; i < last_byte; i++) {
