@@ -38,8 +38,8 @@ namespace testing {
 bool VerboseOutput = false;
 
 struct TestUserData {
-  size_t current_individual;
-  size_t current_generation;
+  size_t current_individual = 0;
+  size_t current_generation = 0;
   BitVector target_bits;
 };
 

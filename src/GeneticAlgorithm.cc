@@ -403,6 +403,7 @@ const Individual& GeneticAlgorithm::SelectOne(const Population& population) {
       assert(false);
       // If asserts are turned off, this will fail to build unless we return
       // something here so blindly fall-thru into the rank selector case.
+      [[fallthrough]];
     case SelectorType::Rank:
       return population.RankSelect();
   }
