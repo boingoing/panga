@@ -10,9 +10,12 @@
 
 namespace panga {
 
+class BitVector;
 class Genome;
 class Individual;
 class RandomWrapper;
+
+using FitnessFunction = double(*)(Individual*, void*);
 
 /**
  * Just a collection of Individual objects.<br/>
@@ -46,7 +49,7 @@ public:
      * Clears any individuals currently in the population.
      * @param initial_population We will construct new population members and interpret these values as binary chromosome data.
      */
-    void Initialize(const std::vector<const BitVector>& initial_population);
+    void Initialize(const std::vector<BitVector>& initial_population);
 
     /**
      * Initialize the set of partial sums we use for the roulette wheel selector.<br/>
@@ -72,10 +75,17 @@ public:
     const Individual& GetBestIndividual() const;
 
     /**
-     * Return the Individual at |index| position in the population.<br/>
+     * Return the Individual at |index| position in the population based on fitness where the individual at index 0 is the most fit, the second most fit is at index 1, etc.<br/>
      * Note: Requires the population to have been sorted.
      */
     const Individual& GetIndividual(size_t index) const;
+
+    /**
+     * Get a writable reference to the individual at |index| position in the population.<br/>
+     * Does not require the population to be sorted and does not return individuals in relative order of fitness.<br/>
+     * Note: Modifying individuals in the population while the genetic algorithm is running may lead to undexpected results.
+     */
+    Individual& GetIndividualWritable(size_t index);
 
     /**
      * Get the minimum score among individuals in the population.
@@ -122,6 +132,8 @@ public:
      * Select the individual in the population with highest fitness score.
      */
     const Individual& RankSelect() const;
+
+    void Evaluate(FitnessFunction fitness_function, void* user_data);
 
 private:
     const Genome& genome_;

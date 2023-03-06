@@ -17,6 +17,8 @@ namespace panga {
 class Individual;
 class BitVector;
 
+using FitnessFunction = double(*)(Individual*, void*);
+
 class GeneticAlgorithm {
 public:
     /**
@@ -229,8 +231,6 @@ public:
         Proportional
     };
 
-    typedef double(*FitnessFunction)(Individual*, void*);
-
     GeneticAlgorithm();
     GeneticAlgorithm(const GeneticAlgorithm& rhs) = delete;
     GeneticAlgorithm& operator=(const GeneticAlgorithm& rhs) = delete;
@@ -441,10 +441,11 @@ public:
     void Initialize();
 
     /**
-     * Initialize the GeneticAlgorithm population based on |initial_population|.
+     * Initialize the GeneticAlgorithm population based on |initial_population|.<br/>
+     * Note: We need to call this before calling Initialize()
      * @param initial_population We will construct new population members and interpret these values as binary chromosome data.
      */
-    void SetInitialPopulation(const std::vector<const BitVector>& initial_population);
+    void SetInitialPopulation(const std::vector<BitVector>& initial_population);
 
     /**
      * Perform one step of the genetic algorithm:<br/>
@@ -480,8 +481,17 @@ protected:
     void Mutate(Individual* individual, double mutation_percentage);
     double GetCurrentMutationRate();
 
+    /**
+     * If the selector we're using requires some initialization based on the population, this function will perform that initialization.
+     */
     void InitializeSelector(Population* population);
     std::pair<const Individual&, const Individual&> SelectParents(const Population& population);
+
+    /**
+     * Uses the selector to choose one Individual from |population|.
+     * @see SelectorType
+     * @see SetSelectorType
+     */
     const Individual& SelectOne(const Population& population);
 
     /**
@@ -504,10 +514,11 @@ protected:
 
 private:
     Genome genome_;
-    Population population_;
-    Population last_generation_population_;
     std::vector<Population> populations_;
-    MutationRateSchedule mutation_rate_schedule_ = MutationRateSchedule::Constant;
+    RandomWrapper random_;
+
+    void* user_data_ = nullptr;
+    FitnessFunction fitness_function_ = nullptr;
 
     size_t population_size_ = 0;
     size_t total_generations_ = 0;
@@ -520,23 +531,20 @@ private:
     double crossover_rate_ = 0.9;
     double mutated_elite_mutation_rate_ = 0.0;
 
-    CrossoverType crossover_type_ = CrossoverType::Uniform;
-    MutatorType mutator_type_ = MutatorType::Flip;
-    SelectorType selector_type_ = SelectorType::Tournament;
-
     size_t tournament_size_ = 2;
     size_t k_point_crossover_point_count_ = 3;
     double self_adaptive_mutation_diversity_floor_ = 0.0002;
     double self_adaptive_mutation_aggressive_rate_ = 0.1;
     size_t proportional_mutation_bit_count_ = 1;
 
+    CrossoverType crossover_type_ = CrossoverType::Uniform;
+    MutatorType mutator_type_ = MutatorType::Flip;
+    SelectorType selector_type_ = SelectorType::Tournament;
+    MutationRateSchedule mutation_rate_schedule_ = MutationRateSchedule::Constant;
+
     bool crossover_ignore_gene_boundaries_ = true;
     bool allow_same_parent_couples_ = true;
-
-    void* user_data_ = nullptr;
-    FitnessFunction fitness_function_ = nullptr;
-
-    RandomWrapper random_;
+    bool is_initial_population_evaluated_ = false;
 };
 
 }  // namespace panga

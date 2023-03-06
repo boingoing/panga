@@ -29,7 +29,7 @@ void Population::Resize(size_t size, RandomWrapper* random) {
     }
 }
 
-void Population::Initialize(const std::vector<const BitVector>& initial_population) {
+void Population::Initialize(const std::vector<BitVector>& initial_population) {
     // Destroy any individuals currently in the population and construct new ones based on the |initial_population| BVs.
     individuals_.clear();
 
@@ -75,6 +75,7 @@ void Population::Sort() {
 void Population::Replace(size_t index, const Individual& individual) {
     assert(individuals_.size() > index);
 
+    // TODO(boingoing): Should we replace based on sorted index?
     individuals_[index] = individual;
 }
 
@@ -91,6 +92,11 @@ const Individual& Population::GetIndividual(size_t index) const {
 
     const auto sorted_index = sorted_indices_[index];
     return individuals_[sorted_index];
+}
+
+Individual& Population::GetIndividualWritable(size_t index) {
+    assert(index < individuals_.size());
+    return individuals_[index];
 }
 
 double Population::GetMinimumScore() const {
@@ -143,6 +149,34 @@ double Population::GetPopulationDiversity() const {
     const size_t total_compares = (individuals_.size() * (individuals_.size() - 1U)) >> 2U;
     const size_t total_bits = total_compares * genome_bits;
     return static_cast<double>(distance) / total_bits;
+}
+
+void Population::Evaluate(FitnessFunction fitness_function, void* user_data) {
+    // Score members of population.
+    for (auto& individual : individuals_) {
+        individual.SetScore(fitness_function(&individual, user_data));
+    }
+
+    // Sort the population by increasing raw score.
+    Sort();
+
+    // Calculate the Individual fitness scores.
+    double fitness_sum = 0.0;
+    const double best_score = GetBestIndividual().GetScore();
+    const double worst_score = GetIndividual(Size() - 1U).GetScore();
+
+    // We need to invert the trend of scores.
+    // First, calculate best+worst - score[i] as an intermediate fitness score.
+    for (auto& individual : individuals_) {
+        const double temp_fitness = best_score + worst_score - individual.GetScore();
+        fitness_sum += temp_fitness;
+        individual.SetFitness(temp_fitness);
+    }
+
+    // Now calculate fitness as a proportion of the intermediate sum.
+    for (auto& individual : individuals_) {
+        individual.SetFitness(individual.GetFitness() / fitness_sum);
+    }
 }
 
 const Individual& Population::UniformSelect(RandomWrapper* random) const {

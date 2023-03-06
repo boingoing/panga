@@ -12,7 +12,7 @@
 
 namespace panga {
 
-GeneticAlgorithm::GeneticAlgorithm() : population_(genome_), last_generation_population_(genome_) {
+GeneticAlgorithm::GeneticAlgorithm() {
     populations_.emplace_back(genome_);
     populations_.emplace_back(genome_);
 }
@@ -65,7 +65,7 @@ void GeneticAlgorithm::SetFitnessFunction(FitnessFunction fitness_function) {
     fitness_function_ = fitness_function;
 }
 
-GeneticAlgorithm::FitnessFunction GeneticAlgorithm::GetFitnessFunction() const {
+FitnessFunction GeneticAlgorithm::GetFitnessFunction() const {
     return fitness_function_;
 }
 
@@ -185,22 +185,26 @@ size_t GeneticAlgorithm::GetProportionalMutationBitCount() const {
     return proportional_mutation_bit_count_;
 }
 
-const Population& GeneticAlgorithm::GetPopulation() const {
-    return last_generation_population_;
-}
-
-void GeneticAlgorithm::SetInitialPopulation(const std::vector<const BitVector>& initial_population) {
+void GeneticAlgorithm::SetInitialPopulation(const std::vector<BitVector>& initial_population) {
+    // TODO(boingoing): This doesn't support setting an initial population after the genetic algorithm has begun, we should add some kind of reset mechanism?
     auto& population = GetCurrentPopulation();
     population.Initialize(initial_population);
 }
 
 void GeneticAlgorithm::Initialize() {
+    // Reset the current generation.
+    current_generation_ = 0;
+
     // If the population isn't full, this will fill it up with random individuals.
     auto& population = GetCurrentPopulation();
     population.Resize(population_size_, &random_);
 
-    // Reset the current generation.
-    current_generation_ = 0;
+    // The last generation population needs to have the same number of individuals in it but all random ones will do.
+    auto& last_generation_population = GetLastGenerationPopulation();
+    last_generation_population.Resize(population_size_, &random_);
+
+    // Reset the flag to track if we have already evaluated the initial population.
+    is_initial_population_evaluated_ = false;
 }
 
 Population& GeneticAlgorithm::GetCurrentPopulation() {
@@ -217,42 +221,52 @@ Population& GeneticAlgorithm::GetLastGenerationPopulation() {
     return populations_[previous_population_index];
 }
 
-void GeneticAlgorithm::Step() {
-    auto& current_population = GetCurrentPopulation();
+const Population& GeneticAlgorithm::GetPopulation() const {
+    // Even generations should use the 0th population as current.
+    // Odd generations should use the 1st population as current.
+    const size_t current_population_index = current_generation_ % 2U;
+    return populations_[current_population_index];
+}
 
+void GeneticAlgorithm::Step() {
     // If we're on any generation other than the 0th one, we need to build the current population based on the previous generation.
-    if (current_generation_ != 0) {
-        const auto& last_generation_population = GetLastGenerationPopulation();
+    if (is_initial_population_evaluated_) {
+        current_generation_++;
+        auto& current_population = GetCurrentPopulation();
+        auto& last_generation_population = GetLastGenerationPopulation();
+
         // Elitism
         // Add the best individuals from last generation into the current population.
-        // Note: last_generation_population_ must already be sorted with best individuals at the front.
+        // Note: last_generation_population must already be sorted with best individuals at the front.
         for (size_t i = 0; i < elite_count_; i++) {
             // Overwrite the first i members of population with those from last generation.
-            population_[i] = last_generation_population_[i];
+            const auto& elite = last_generation_population.GetIndividual(i);
+            current_population.Replace(i, elite);
         }
 
         // Mutated elitism
         // Take the best individuals from the last generation but mutate them by a variable rate.
         for (size_t i = 0; i < mutated_elite_count_; i++) {
-            auto& mutated_elite = population_[elite_count_ + i];
-            mutated_elite = last_generation_population_[i];
+            const auto& elite = last_generation_population.GetIndividual(i);
+            const size_t index = elite_count_ + i;
+            current_population.Replace(index, elite);
+            auto& mutated_elite = current_population.GetIndividualWritable(index);
             Mutate(&mutated_elite, mutated_elite_mutation_rate_);
         }
 
         // Get the mutation rate for the current generation.
-        // Note: This can depend on the population already having been evaluated.
+        // Note: This can depend on the previous population already having been evaluated.
         const double current_mutation_rate = GetCurrentMutationRate();
-        // Initialize the selector.
-        InitializeSelector(&last_generation_population_);
-
         // We already added elite_count_ + mutated_elite_count_ individuals based on the last generation.
         size_t current_population_size = elite_count_ + mutated_elite_count_;
+        // Initialize the selector.
+        InitializeSelector(&last_generation_population);
         // Create offspring from individuals in last generation.
         while (current_population_size < population_size_) {
-            auto& offspring = population_[current_population_size++];
+            auto& offspring = current_population.GetIndividualWritable(current_population_size++);
 
             // Select a couple from the last generation.
-            const auto parents = SelectParents(last_generation_population_);
+            const auto parents = SelectParents(last_generation_population);
 
             // See if we will do crossover or duplicate a parent.
             if (random_.CoinFlip(crossover_rate_)) {
@@ -268,37 +282,12 @@ void GeneticAlgorithm::Step() {
     }
 
     // Score and sort the current population.
-    // This population is either the result of Initialize() or a previous Step() operation.
-    Evaluate(&current_population);
+    // This population is either the result of Initialize() or a Step() operation.
+    auto& current_population = GetCurrentPopulation();
+    current_population.Evaluate(fitness_function_, user_data_);
 
-    current_generation_++;
-}
-
-void GeneticAlgorithm::Evaluate(Population* population) {
-    // Score members of population.
-    for (auto& individual : *population) {
-        individual.SetScore(fitness_function_(&individual, user_data_));
-    }
-
-    // Sort the population by increasing raw score.
-    std::sort(population->begin(), population->end());
-
-    // Calculate the Individual fitness scores.
-    double fitness_sum = 0.0;
-    const double best_score = population->front().GetScore();
-    const double worst_score = population->back().GetScore();
-
-    // We need to invert the trend of scores.
-    // First, calculate best+worst - score[i] as an intermediate fitness score.
-    for (auto& individual : *population) {
-        const double temp_fitness = best_score + worst_score - individual.GetScore();
-        fitness_sum += temp_fitness;
-        individual.SetFitness(temp_fitness);
-    }
-
-    // Now calculate fitness as a proportion of the intermediate sum.
-    for (auto& individual : *population) {
-        individual.SetFitness(individual.GetFitness() / fitness_sum);
+    if (current_generation_ == 0) {
+        is_initial_population_evaluated_ = true;
     }
 }
 
@@ -313,20 +302,27 @@ double GeneticAlgorithm::GetCurrentMutationRate() {
     case MutationRateSchedule::Constant:
         return mutation_rate_;
     case MutationRateSchedule::Deterministic:
-        // If total generations is 0 or if we are on a generation after the total counter,
-        // deterministic calculation would return 0 for mutation rate.
+    {
+        // If total generations is 0 or if we are on a generation after the total counter, deterministic calculation would return 0 for mutation rate.
         // In that case just use the constant-schedule mutation rate instead.
-        return total_generations_ == 0 || current_generation_ > total_generations_ ?
-            mutation_rate_ :
-            1.0 / (2.0 + ((genome_.BitsRequired() - 2.0) / (total_generations_ - 1.0)) * current_generation_);
-    case MutationRateSchedule::SelfAdaptive:
-        if (GetPopulationDiversity() < self_adaptive_mutation_diversity_floor_) {
-            return self_adaptive_mutation_aggressive_rate_;
-        } else {
+        if (total_generations_ == 0 || current_generation_ > total_generations_) {
             return mutation_rate_;
         }
+
+        // The deterministic schedule starts very aggressively using the mutation operator to search the error surface. The first generation we build (this will be the one built out of the evaluated 0th generation) will be mutated at a rate of about 0.5 - half! After that, the rate drops based on the current generation.
+        const auto bits_per_generation = static_cast<double>(genome_.BitsRequired()) / total_generations_;
+        return 1.0 / (bits_per_generation * (current_generation_ - 1U) + 2U);
+    }
+    case MutationRateSchedule::SelfAdaptive:
+    {
+        const auto& last_generation_population = GetLastGenerationPopulation();
+        if (last_generation_population.GetPopulationDiversity() < self_adaptive_mutation_diversity_floor_) {
+            return self_adaptive_mutation_aggressive_rate_;
+        }
+        return mutation_rate_;
+    }
     case MutationRateSchedule::Proportional:
-        // Proportional schedule sets a mutation probability in order to flip proportional_mutation_bit_count_ bits.
+        // Proportional schedule sets a mutation probability in order to flip proportional_mutation_bit_count_ bits in the genome.
         assert(genome_.BitsRequired() != 0);
         return proportional_mutation_bit_count_ * (1.0 / genome_.BitsRequired());
     default:
@@ -388,7 +384,7 @@ const Individual& GeneticAlgorithm::SelectOne(const Population& population) {
 }
 
 std::pair<const Individual&, const Individual&> GeneticAlgorithm::SelectParents(const Population& population) {
-    assert(!population.empty());
+    assert(population.Size() > 0);
 
     const auto& first = SelectOne(population);
 
@@ -399,10 +395,12 @@ std::pair<const Individual&, const Individual&> GeneticAlgorithm::SelectParents(
     }
 
     // When we want to avoid selecting the same parent for each pair element, do the simple thing and select from a population which doesn't contain |first|.
-    Population temp;
-    for (const auto& i : population) {
-        if (&i != &first) {
-            temp.push_back(i);
+    Population temp(genome_);
+    temp.Resize(population.Size() - 1U, &random_);
+    for (size_t target_index = 0, i = 0; i < population.Size(); i++) {
+        const auto& individual = population.GetIndividual(i);
+        if (&individual != &first) {
+            temp.Replace(target_index++, individual);
         }
     }
     InitializeSelector(&temp);
