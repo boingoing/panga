@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['chromosome',['Chromosome',['../classpanga_1_1Chromosome.html',1,'panga']]],
-  ['clear',['Clear',['../classpanga_1_1BitVector.html#a0f79b0323382c67f1fcaac75cfd238d0',1,'panga::BitVector']]],
-  ['clip',['Clip',['../classpanga_1_1BitVector.html#aa74040eb223ee39f38ec242f102b4160',1,'panga::BitVector']]],
-  ['constant',['Constant',['../classpanga_1_1GeneticAlgorithm.html#a84ecf735778d44eceefdc7c9f5a4f21bacb17869fe51048b5a5c4c6106551a255',1,'panga::GeneticAlgorithm']]],
-  ['countsetbits',['CountSetBits',['../classpanga_1_1BitVector.html#ac7bc551e11f27d42e14ff2633fbf7813',1,'panga::BitVector']]],
-  ['crossovertype',['CrossoverType',['../classpanga_1_1GeneticAlgorithm.html#a121354609fbc300abfb96556935f4b35',1,'panga::GeneticAlgorithm']]]
+  ['decodebooleangene_12',['DecodeBooleanGene',['../classpanga_1_1Chromosome.html#a5d02c64723057cf69faf4ab6e69cb241',1,'panga::Chromosome']]],
+  ['decodefloat_13',['DecodeFloat',['../classpanga_1_1Chromosome.html#a3069150c87f4c3e5f295848fdb549ea8',1,'panga::Chromosome']]],
+  ['decodefloatgene_14',['DecodeFloatGene',['../classpanga_1_1Chromosome.html#a1d2896de1e7ed058a7e19a0e5f5750a1',1,'panga::Chromosome']]],
+  ['decodegray_15',['DecodeGray',['../classpanga_1_1Chromosome.html#aced7af17c5e73b8219ee620fc5603c0b',1,'panga::Chromosome']]],
+  ['decodeintegergene_16',['DecodeIntegerGene',['../classpanga_1_1Chromosome.html#a22ca218f98887751052734aae71c880f',1,'panga::Chromosome']]],
+  ['deterministic_17',['Deterministic',['../classpanga_1_1GeneticAlgorithm.html#a84ecf735778d44eceefdc7c9f5a4f21bac172d0b7b7d4c61a931d50369d37b11f',1,'panga::GeneticAlgorithm']]]
 ];

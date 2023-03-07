@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['encodebooleangene',['EncodeBooleanGene',['../classpanga_1_1Chromosome.html#a323062f8834c8db87ae1b8fd01474c60',1,'panga::Chromosome']]],
-  ['encodefloat',['EncodeFloat',['../classpanga_1_1Chromosome.html#a09f2ddd4aa60c478ba6133fdcc624880',1,'panga::Chromosome']]],
-  ['encodefloatgene',['EncodeFloatGene',['../classpanga_1_1Chromosome.html#a407c30ca193bfaddd74680c343555ba3',1,'panga::Chromosome']]],
-  ['encodegray',['EncodeGray',['../classpanga_1_1Chromosome.html#a6d95192d103c73a86c77f93efe02f89c',1,'panga::Chromosome']]],
-  ['encodeintegergene',['EncodeIntegerGene',['../classpanga_1_1Chromosome.html#ad16311a9d53d9feb5211a82652220dd7',1,'panga::Chromosome']]],
-  ['equals',['Equals',['../classpanga_1_1BitVector.html#aab9571e295c027eaf3de0b2ed0641e21',1,'panga::BitVector::Equals(const BitVector *rhs, size_t bitsToCompare) const'],['../classpanga_1_1BitVector.html#a9968c9ed9fd8565f6969c2903c33e6de',1,'panga::BitVector::Equals(const BitVector *rhs) const']]],
-  ['evaluate',['Evaluate',['../classpanga_1_1GeneticAlgorithm.html#a36729bf431bb5887ba64275754e09723',1,'panga::GeneticAlgorithm']]]
+  ['encodebooleangene_157',['EncodeBooleanGene',['../classpanga_1_1Chromosome.html#a02f469e1ff1d377a6c1d05947024a1ce',1,'panga::Chromosome']]],
+  ['encodefloat_158',['EncodeFloat',['../classpanga_1_1Chromosome.html#a0c57adfca46a2cc5ea778f3661d639f6',1,'panga::Chromosome']]],
+  ['encodefloatgene_159',['EncodeFloatGene',['../classpanga_1_1Chromosome.html#a2e223df6eab04c6b2d43e014300f5c98',1,'panga::Chromosome']]],
+  ['encodegray_160',['EncodeGray',['../classpanga_1_1Chromosome.html#ae85b03f07d3bdfd05af3894313b127b1',1,'panga::Chromosome']]],
+  ['encodeintegergene_161',['EncodeIntegerGene',['../classpanga_1_1Chromosome.html#a079b03835429b21b09adf831672a35e3',1,'panga::Chromosome']]],
+  ['equals_162',['Equals',['../classpanga_1_1BitVector.html#ab5cb676fee16cbe00ea90b6d660e0fab',1,'panga::BitVector::Equals(const BitVector &amp;rhs, size_t bits_to_compare) const'],['../classpanga_1_1BitVector.html#a8a97c5bd1b71a9c374fac170226f8a2b',1,'panga::BitVector::Equals(const BitVector &amp;rhs) const']]],
+  ['evaluate_163',['Evaluate',['../classpanga_1_1Population.html#a08ede33788fb8e0876dea5e47f7ddd6e',1,'panga::Population']]]
 ];

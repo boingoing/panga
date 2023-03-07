@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hammingdistance',['HammingDistance',['../classpanga_1_1BitVector.html#ab677b2094a8a06ee08cec1c719908a4a',1,'panga::BitVector']]]
+  ['hammingdistance_195',['HammingDistance',['../classpanga_1_1BitVector.html#aa03fa7194b30e801f7db1a558cb2775f',1,'panga::BitVector']]]
 ];
