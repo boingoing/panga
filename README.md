@@ -32,46 +32,47 @@ void Test() {
     BitVector target;
     target.FromStringHex("ffffffff", 8);
 
-    // Treat the genome as a bitvector with length equal to the target.
-    Genome genome;
-    
-
     GeneticAlgorithm ga;
     Genome& genome = ga.GetGenome();
+    // Treat the genome as a bitvector with length equal to the target.
     genome.AddBooleanGenes(target.GetBitCount());
-    ga.SetGenome(&genome);
+
     ga.SetPopulationSize(100);
     ga.SetFitnessFunction(TestObjective);
     ga.SetUserData(&target);
     ga.Initialize();
     
+    // When the minimum score of the population drops below 1, the genetic algorithm has matched the bit-pattern.
+    double min_score = 1;
     do {
       ga.Step();
       
       // Print current generation stats.
+      const auto& population = ga.GetPopulation();
       std::cout << "Generation " << ga.GetCurrentGeneration()
-                << " => avg: " << ga.GetAverageScore()
-                << " min: " << ga.GetMinimumScore()
-                << " stdev: " << ga.GetScoreStandardDeviation()
-                << " popdiv: " << ga.GetPopulationDiversity()
+                << " => avg: " << population.GetAverageScore()
+                << " min: " << population.GetMinimumScore()
+                << " stdev: " << population.GetScoreStandardDeviation()
+                << " popdiv: " << population.GetPopulationDiversity()
                 << std::endl;
-    } while (ga.GetMinimumScore() > 0.5);
+      min_score = population.GetMinimumScore();
+    } while (min_score > 0.5);
 }
 ```
 
 ## Building panga
 
-You can build panga on any platform with a compiler which supports c++17 language standards mode. The library is designed to be portable and easy to add to your project. Add the panga source files in `panga/src` to your build definition and you should be ready to use panga.
+You can build panga on any platform with a compiler which supports c++17 language standards mode. The library is designed to be portable and easy to add to your project. We do not release binaries here, but panga compiles into a static library which can be added as a dependency. Add the panga cmake file to your build system and you should be ready to use panga.
 
 ### Tested build configurations
 
 Windows 10
-* CMake 3.13.0-rc3
-* Visual Studio 2017 15.8.9
+* CMake 3.17.0
+* Visual Studio 2019 16.11.23
 
 Ubuntu 18.04
-* CMake 3.10.2
-* Clang 6.0.0
+* CMake 3.16.3
+* Clang 10.0.0
 
 ## Testing panga
 
@@ -79,15 +80,12 @@ The library ships with a simple test program in the `panga/test` folder.
 
 ```console
 > git clone https://github.com/boingoing/panga/panga.git
-> cd panga/out
+> mkdir panga/build
+> cd panga/build
 > cmake ..
 > make
 > ./panga_test
 ```
-
-### Using Visual Studio on Windows
-
-Above `cmake` command generates a Visual Studio solution file (`panga/out/panga_test.sln`) on Windows platforms with Visual Studio. You can open this solution in Visual Studio and use it to build the test program.
 
 ## Documentation
 
