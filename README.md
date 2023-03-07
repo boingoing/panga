@@ -2,7 +2,7 @@
 
 # panga
 
-A simple, portable, and efficient genetic algorithm library.
+A zero-dependency, portable, and efficient genetic algorithm library.
 
 ## Why panga
 
@@ -18,12 +18,13 @@ using namespace panga;
 // Return fitness score for Individual - lower is better.
 double TestObjective(Individual* individual, void* userData) {
     // Cast the user data into a BitVector - this is target.
-    BitVector* bv = static_cast<BitVector*>(userData);
+    auto* bv = static_cast<BitVector*>(userData);
     
     // Calculate fitness as count of bits different from target.
-    size_t failBits = br->HammingDistance(individual);
+    const auto fail_bits = br->HammingDistance(*individual);
 
-    return (double) failBits;
+    // Best individual would have zero different bits.
+    return static_cast<double>(fail_bits);
 }
 
 void Test() {
@@ -33,9 +34,11 @@ void Test() {
 
     // Treat the genome as a bitvector with length equal to the target.
     Genome genome;
-    genome.AddBooleanGenes(target.GetBitCount());
+    
 
     GeneticAlgorithm ga;
+    Genome& genome = ga.GetGenome();
+    genome.AddBooleanGenes(target.GetBitCount());
     ga.SetGenome(&genome);
     ga.SetPopulationSize(100);
     ga.SetFitnessFunction(TestObjective);
