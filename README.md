@@ -13,8 +13,6 @@ Panga is adapted from the genetic algorithm component of a hobby project named P
 Panga offers a simple interface for building and managing genetic algorithms.
 
 ```c++
-using namespace panga;
-
 // Return fitness score for Individual - lower is better.
 double TestObjective(Individual* individual, void* userData) {
     // Cast the user data into a BitVector - this is target.
