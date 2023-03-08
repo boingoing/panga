@@ -38,7 +38,7 @@ size_t Genome::GetGeneStartBitIndex(size_t gene_index) const {
 
   return gene_index >= GetFirstBooleanGeneIndex()
              ? first_boolean_gene_bit_index_ + genes_.size() - gene_index
-             : genes_[gene_index].start_bit_index_;
+             : genes_[gene_index].start_bit_index;
 }
 
 size_t Genome::GetGeneBitWitdh(size_t gene_index) const {
@@ -46,7 +46,7 @@ size_t Genome::GetGeneBitWitdh(size_t gene_index) const {
 
   return gene_index >= GetFirstBooleanGeneIndex()
              ? 1
-             : genes_[gene_index].bit_width_;
+             : genes_[gene_index].bit_width;
 }
 
 size_t Genome::GetBooleanGeneCount() const { return boolean_gene_count_; }
@@ -57,7 +57,7 @@ size_t Genome::BitsRequired() const {
   }
 
   const Gene& gene = genes_.back();
-  return gene.start_bit_index_ + gene.bit_width_ + boolean_gene_count_;
+  return gene.start_bit_index + gene.bit_width + boolean_gene_count_;
 }
 
 size_t Genome::AddGene(size_t bit_width, bool byte_align) {
@@ -68,7 +68,7 @@ size_t Genome::AddGene(size_t bit_width, bool byte_align) {
   size_t bit_start_index = 0;
   if (!genes_.empty()) {
     const Gene& gene = genes_.back();
-    bit_start_index = gene.start_bit_index_ + gene.bit_width_;
+    bit_start_index = gene.start_bit_index + gene.bit_width;
   }
 
   // Align the bits underlying the gene such that it begins and ends at a byte

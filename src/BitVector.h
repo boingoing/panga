@@ -241,7 +241,7 @@ class BitVector {
 
  public:
   struct HexFormatWrapper {
-    std::ostream& _os;
+    std::ostream& os;
   };
   struct HexFormat_t {
     friend HexFormatWrapper operator<<(std::ostream& out,
