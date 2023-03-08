@@ -31,8 +31,8 @@ namespace panga {
 class Genome {
  protected:
   struct Gene {
-    size_t start_bit_index_;
-    size_t bit_width_;
+    size_t start_bit_index;
+    size_t bit_width;
   };
 
  public:

@@ -388,7 +388,7 @@ BitVector::HexFormatWrapper operator<<(
 
 std::ostream& operator<<(const BitVector::HexFormatWrapper& wrapper,
                          const BitVector& bv) {
-  std::ostream& out = wrapper._os;
+  std::ostream& out = wrapper.os;
   bv.WriteToStreamHex(out);
   return out;
 }
