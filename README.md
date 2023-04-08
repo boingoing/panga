@@ -1,4 +1,4 @@
-[![master build status](https://travis-ci.org/boingoing/panga.svg?branch=master)](https://travis-ci.org/boingoing/panga/builds#)
+[![main build status](https://app.travis-ci.com/boingoing/panga.svg?branch=main)](https://app.travis-ci.com/github/boingoing/panga/builds)
 
 # panga
 
